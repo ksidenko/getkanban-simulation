@@ -20,13 +20,6 @@ init a d t =
     , testStoryPointsAvailable  = t
     }
 
---init : Model
---init =
-    --{ analyticStoryPointsAvailable = 2
-    --, devStoryPointsAvailable  = 3
-    --, testStoryPointsAvailable  = 2
-    --}
-
 -- UPDATE
 type Action = Increment | Decrement | Reset
 
