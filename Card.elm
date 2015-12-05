@@ -11,47 +11,37 @@ type alias Model =
     { analyticStoryPointsAvailable : Int
     , devStoryPointsAvailable  : Int
     , testStoryPointsAvailable  : Int
+    , countDices : Int
     }
 
-init : Int -> Int -> Int -> Model
-init a d t =
+init : Int -> Int -> Int -> Int -> Model
+init a d t c =
     { analyticStoryPointsAvailable = a
     , devStoryPointsAvailable  = d
     , testStoryPointsAvailable  = t
+    , countDices = c
     }
 
 -- UPDATE
-type Action = Increment | Decrement | Reset
+type Action = SelectCard | DeselectCard
 
 update : Action -> Model -> Model
 update action model =
   case action of
-    Reset ->
-        init 7 7 7
-
-    Increment ->
-        { model |
-            analyticStoryPointsAvailable = model.analyticStoryPointsAvailable + 1
-        }
-
-    Decrement ->
-        { model |
-            analyticStoryPointsAvailable = model.analyticStoryPointsAvailable - 1
-        }
+      SelectCard ->
+          { model | countDices = 1 }
+      DeselectCard ->
+          { model | countDices = 0 }
 
 -- VIEW
 
 view : Signal.Address Action -> Model -> Html
 view address model =
   div []
-    [ button [ onClick address Decrement ] [ text "-" ]
-    , div [ countStyle ] [ text (toString model.analyticStoryPointsAvailable ) ]
+    [ div [ countStyle ] [ text (toString model.analyticStoryPointsAvailable ) ]
     , div [ countStyle ] [ text (toString model.devStoryPointsAvailable) ]
     , div [ countStyle ] [ text (toString model.testStoryPointsAvailable) ]
-    , button [ onClick address Increment ] [ text "+" ]
-    , button [ onClick address Reset ] [ text "reset" ]
     ]
-
 
 countStyle : Attribute
 countStyle =
