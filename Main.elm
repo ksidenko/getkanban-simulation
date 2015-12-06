@@ -7,7 +7,7 @@ import Signal exposing (..)
 
 import Card exposing (init, update, view)
 import Column exposing (..)
---import ColumnGroup exposing (..)
+import ColumnGroup exposing (..)
 --import Board exposing (..)
 
 --https://github.com/evancz/start-app/blob/master/src/StartApp.elm
@@ -15,9 +15,9 @@ import StartApp
 
 app =
     StartApp.start
-        { init = Column.init
-        , view = Column.view
-        , update = Column.update
+        { init = ColumnGroup.init
+        , view = ColumnGroup.view
+        , update = ColumnGroup.update
         , inputs = []
         }
 

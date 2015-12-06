@@ -41,10 +41,10 @@ type alias Context =
 
 view: Context -> Model -> Html
 view context model =
-  div [ countStyle ]
-    [ div [ ] [ text (toString model.analyticStoryPointsAvailable ) ]
-    , div [ ] [ text (toString model.devStoryPointsAvailable) ]
-    , div [ ] [ text (toString model.testStoryPointsAvailable) ]
+  span [ countStyle ]
+    [ span [ ] [ text (toString model.analyticStoryPointsAvailable ) ]
+    , span [ ] [ text (toString model.devStoryPointsAvailable) ]
+    , span [ ] [ text (toString model.testStoryPointsAvailable) ]
     ]
 
 countStyle : Attribute

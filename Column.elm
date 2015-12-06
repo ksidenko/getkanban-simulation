@@ -27,7 +27,7 @@ init =
 
 -- UPDATE
 
-type Action 
+type Action
     = SelectCard ID Card.Action
     | DeselectCard ID Card.Action
     | AddCard
@@ -87,15 +87,22 @@ update action model =
             }
         , Effects.none
         )
+        
 -- VIEW
 
 view : Signal.Address Action -> Model -> Html
 view address model =
-    let insert = button [ onClick address AddCard ] [ text "Add Card" ]
+    let 
+        insert = button [ onClick address AddCard ] [ text "Add Card" ]
     in
-        div [] (insert :: List.map (viewCard address) model.cards)
+        div [ countStyle ] (insert :: List.map (viewCard address) model.cards)
 
 
+countStyle : Attribute
+countStyle =
+  style
+    [ ("width", "30px")
+    ]
 viewCard : Signal.Address Action -> (ID,Card.Model) -> Html
 viewCard address (id, model) =
   let context =
