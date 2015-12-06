@@ -2,21 +2,37 @@
 import Task exposing (Task, andThen)
 import TaskTutorial exposing (getCurrentTime, print)
 import Task exposing (Task, andThen)
-import Debug exposing (..)
+import Effects exposing (Never)
+import Signal exposing (..)
 
 import Card exposing (init, update, view)
 import Column exposing (..)
-import ColumnGroup exposing (..)
+--import ColumnGroup exposing (..)
 --import Board exposing (..)
-import StartApp.Simple exposing (start)
+
+--https://github.com/evancz/start-app/blob/master/src/StartApp.elm
+import StartApp
+
+app =
+    StartApp.start
+        { init = Column.init
+        , view = Column.view
+        , update = Column.update
+        , inputs = []
+        }
 
 main =
-  start
-    { model = Column.init
-    , update = Column.update
-    , view = Column.view
-    }
+    app.html
 
+port tasks : Signal (Task.Task Never ())
+port tasks =
+    app.tasks
+
+
+
+
+
+-- some test with Tasks
 printTimeVerbose : Task x ()
 printTimeVerbose =
     getCurrentTime `andThen` \time -> print time

@@ -35,12 +35,16 @@ update action model =
 
 -- VIEW
 
-view : Signal.Address Action -> Model -> Html
-view address model =
-  div []
-    [ div [ countStyle ] [ text (toString model.analyticStoryPointsAvailable ) ]
-    , div [ countStyle ] [ text (toString model.devStoryPointsAvailable) ]
-    , div [ countStyle ] [ text (toString model.testStoryPointsAvailable) ]
+type alias Context =
+    { actions : Signal.Address Action
+    }
+
+view: Context -> Model -> Html
+view context model =
+  div [ countStyle ]
+    [ div [ ] [ text (toString model.analyticStoryPointsAvailable ) ]
+    , div [ ] [ text (toString model.devStoryPointsAvailable) ]
+    , div [ ] [ text (toString model.testStoryPointsAvailable) ]
     ]
 
 countStyle : Attribute
@@ -50,5 +54,6 @@ countStyle =
     , ("font-family", "monospace")
     , ("display", "inline-block")
     , ("width", "50px")
+    , ("border", "1px dotted black")
     , ("text-align", "center")
     ]
