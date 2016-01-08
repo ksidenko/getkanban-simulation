@@ -1,4 +1,3 @@
-
 import Task exposing (Task, andThen)
 import TaskTutorial exposing (getCurrentTime, print)
 import Task exposing (Task, andThen)
@@ -14,19 +13,19 @@ import ColumnGroup exposing (..)
 import StartApp
 
 app =
-    StartApp.start
-        { init = ColumnGroup.init
-        , view = ColumnGroup.view
-        , update = ColumnGroup.update
-        , inputs = []
-        }
+  StartApp.start
+    { init = ColumnGroup.init
+    , view = ColumnGroup.view
+    , update = ColumnGroup.update
+    , inputs = []
+    }
 
 main =
-    app.html
+  app.html
 
 port tasks : Signal (Task.Task Never ())
 port tasks =
-    app.tasks
+  app.tasks
 
 
 
@@ -35,7 +34,7 @@ port tasks =
 -- some test with Tasks
 printTimeVerbose : Task x ()
 printTimeVerbose =
-    getCurrentTime `andThen` \time -> print time
+  getCurrentTime `andThen` \time -> print time
 
 port runner : Task x ()
 port runner = printTimeVerbose

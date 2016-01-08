@@ -1,6 +1,5 @@
 module Card where
 
-
 import Html exposing (..)
 import Html.Attributes exposing (style)
 import Html.Events exposing (onClick)
@@ -23,15 +22,17 @@ init a d t c =
     }
 
 -- UPDATE
-type Action = SelectCard | DeselectCard
+type Action
+    = SelectCard
+    | DeselectCard
 
 update : Action -> Model -> Model
 update action model =
   case action of
-      SelectCard ->
-          { model | countDices = 1 }
-      DeselectCard ->
-          { model | countDices = 0 }
+    SelectCard ->
+      { model | countDices = 1 }
+    DeselectCard ->
+      { model | countDices = 0 }
 
 -- VIEW
 
@@ -50,7 +51,7 @@ view context model =
 countStyle : Attribute
 countStyle =
   style
-    [ ("font-size", "20px")
+    [ ("font-size", "24px")
     , ("font-family", "monospace")
     , ("display", "inline-block")
     , ("width", "50px")

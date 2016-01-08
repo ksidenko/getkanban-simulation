@@ -14,6 +14,7 @@ type alias Model =
     }
 
 
+
 init : Int -> Int -> Int -> Int -> Int -> Model
 init s a d t d =
     { selected = ColumnGroup.init s

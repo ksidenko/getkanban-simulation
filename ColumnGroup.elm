@@ -40,20 +40,20 @@ update : Action -> Model -> (Model, Effects Action)
 update action model =
   case action of
     AddCardInProgress act ->
-        let
-            (inProgress_, fx_) = Column.update act model.inProgress
-        in
-            ( Model inProgress_ model.done
-            , Effects.map AddCardInProgress fx_
-            )
+      let
+        (inProgress_, fx_) = Column.update act model.inProgress
+      in
+        ( Model inProgress_ model.done
+        , Effects.map AddCardInProgress fx_
+        )
 
     AddCardDone act ->
-        let
-            (done_, fx_) = Column.update act model.done
-        in
-            ( Model model.inProgress  done_
-            , Effects.map AddCardDone fx_
-            )
+      let
+        (done_, fx_) = Column.update act model.done
+      in
+        ( Model model.inProgress  done_
+        , Effects.map AddCardDone fx_
+        )
 
 -- VIEW
 
