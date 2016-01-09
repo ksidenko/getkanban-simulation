@@ -13,17 +13,17 @@ import Column exposing (Model, init, update, view)
 type alias Model =
     { inProgress: Column.Model
     , done: Column.Model
---    , wip: Int
+    , wip: Int
     }
 
 
-init : (Model, Effects Action)
-init =
+init : Int -> (Model, Effects Action)
+init wip_ =
   let
     (inProgress, inProgressFx) = Column.init "In Progress"
     (done, doneFx) = Column.init "Done"
   in
-    ( Model inProgress done
+    ( Model inProgress done wip_
     , Effects.batch
         [ Effects.map AddCardInProgress inProgressFx
         , Effects.map AddCardDone doneFx
@@ -43,7 +43,7 @@ update action model =
       let
         (inProgress_, fx_) = Column.update act model.inProgress
       in
-        ( Model inProgress_ model.done
+        ( Model inProgress_ model.done model.wip
         , Effects.map AddCardInProgress fx_
         )
 
@@ -51,7 +51,7 @@ update action model =
       let
         (done_, fx_) = Column.update act model.done
       in
-        ( Model model.inProgress  done_
+        ( Model model.inProgress  done_ model.wip
         , Effects.map AddCardDone fx_
         )
 
@@ -60,7 +60,8 @@ update action model =
 view : Signal.Address Action -> Model -> Html
 view address model =
   div []
-    [ Column.view (Signal.forwardTo address AddCardInProgress) model.inProgress
+    [ div [] [ text (toString( model.wip )) ]
+    , Column.view (Signal.forwardTo address AddCardInProgress) model.inProgress
     , Column.view (Signal.forwardTo address AddCardDone) model.done
     ]
 

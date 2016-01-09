@@ -14,7 +14,7 @@ import StartApp
 
 app =
   StartApp.start
-    { init = ColumnGroup.init
+    { init = ColumnGroup.init 4
     , view = ColumnGroup.view
     , update = ColumnGroup.update
     , inputs = []
