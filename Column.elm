@@ -10,16 +10,18 @@ import Card
 
 type alias Model =
     { cards: List ( ID, Card.Model )
+    , columnName: String
     , nextID : ID
     }
 
 type alias ID = Int
 
 
-init : (Model, Effects Action)
-init =
+init : String -> (Model, Effects Action)
+init columnName_ =
     (
       { cards = []
+      , columnName = columnName_
       , nextID = 0
       }
     , Effects.none
@@ -91,7 +93,8 @@ view : Signal.Address Action -> Model -> Html
 view address model =
     let
       insert = div []
-        [ button [ onClick address AddCard ] [ text "Add Card" ]
+        [ div [] [ text model.columnName ]
+        , button [ onClick address AddCard ] [ text "Add Card" ]
         , hr [] []
         ]
     in

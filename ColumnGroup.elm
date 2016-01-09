@@ -20,8 +20,8 @@ type alias Model =
 init : (Model, Effects Action)
 init =
   let
-    (inProgress, inProgressFx) = Column.init
-    (done, doneFx) = Column.init
+    (inProgress, inProgressFx) = Column.init "In Progress"
+    (done, doneFx) = Column.init "Done"
   in
     ( Model inProgress done
     , Effects.batch
