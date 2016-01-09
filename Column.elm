@@ -104,8 +104,8 @@ view address model =
 columnStyle : Attribute
 columnStyle =
   style
-    [ ("width", "30px")
-    , ("display", "inline-block")
+    [ ("display", "block")
+    , ("float", "left")
     , ("width", "90px")
     , ("border", "1px solid black")
     ]
