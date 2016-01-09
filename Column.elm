@@ -95,11 +95,11 @@ view address model =
         , hr [] []
         ]
     in
-      div [ countStyle ] (insert :: List.map (viewCard address) model.cards)
+      div [ columnStyle ] (insert :: List.map (viewCard address) model.cards)
 
 
-countStyle : Attribute
-countStyle =
+columnStyle : Attribute
+columnStyle =
   style
     [ ("width", "30px")
     , ("display", "inline-block")
@@ -107,7 +107,7 @@ countStyle =
     , ("border", "1px solid black")
     ]
 
-viewCard : Signal.Address Action -> (ID,Card.Model) -> Html
+viewCard : Signal.Address Action -> (ID, Card.Model) -> Html
 viewCard address (id, model) =
   let context =
     Card.Context
