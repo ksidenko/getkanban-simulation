@@ -90,7 +90,10 @@ update action model =
 view : Signal.Address Action -> Model -> Html
 view address model =
     let
-      insert = button [ onClick address AddCard ] [ text "Add Card" ]
+      insert = div []
+        [ button [ onClick address AddCard ] [ text "Add Card" ]
+        , hr [] []
+        ]
     in
       div [ countStyle ] (insert :: List.map (viewCard address) model.cards)
 
@@ -99,6 +102,9 @@ countStyle : Attribute
 countStyle =
   style
     [ ("width", "30px")
+    , ("display", "inline-block")
+    , ("width", "90px")
+    , ("border", "1px solid black")
     ]
 
 viewCard : Signal.Address Action -> (ID,Card.Model) -> Html
