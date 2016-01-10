@@ -69,11 +69,9 @@ view address model =
     columnsHtml1 = [Column.view (Signal.forwardTo address AddCardInProgress) model.inProgress]
     columnsHtml2 = if model.onlyOneColumn == False then [Column.view (Signal.forwardTo address AddCardDone) model.done] else []
   in
-    div [ columnGroupStyle ( getCssColumnWidth model.onlyOneColumn ) ] ( columnHeader::(List.append columnsHtml1 columnsHtml2 ))
+    div [ columnGroupStyle ( (\onlyOneColumn -> if onlyOneColumn == True then "92px" else "185px") model.onlyOneColumn ) ]
+      ( columnHeader::(List.append columnsHtml1 columnsHtml2 ))
 
-getCssColumnWidth : Bool -> String
-getCssColumnWidth onlyOneColumn =
-  if onlyOneColumn == True then "92px" else "185px"
 
 columnGroupStyle : String -> Attribute
 columnGroupStyle cssColumnWidth =
