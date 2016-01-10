@@ -14,6 +14,7 @@ type alias Model =
     , developmentStoryPointsCompleted  : Int
     , testingStoryPointsCompleted  : Int
     , countDices : Int
+    , selected : Bool
    }
 
 init : Int -> Int -> Int -> Int -> Model
@@ -25,20 +26,19 @@ init a d t c =
     , developmentStoryPointsCompleted  = 0
     , testingStoryPointsCompleted  = 0
     , countDices = c
+    , selected = False
     }
 
 -- UPDATE
+
 type Action
-    = SelectCard
-    | DeselectCard
+    = ToggleSelectCard
 
 update : Action -> Model -> Model
 update action model =
   case action of
-    SelectCard ->
-      { model | countDices = 1 }
-    DeselectCard ->
-      { model | countDices = 0 }
+    ToggleSelectCard ->
+      { model | selected = not model.selected }
 
 -- VIEW
 
@@ -46,31 +46,33 @@ type alias Context =
     { actions : Signal.Address Action
     }
 
-view: Context -> Model -> Html
+view : Context -> Model -> Html
 view context model =
-  span [ cardStyle ]
-    [ div [] [ span [ ] [ text ("An: " ++ toString model.analyticStoryPointsNeeded ) ]
-             , span [ ] [ text ("/") ]
-             , span [ ] [ text (toString model.analyticStoryPointsCompleted ) ]
-             ]
-    , div [] [ span [ ] [ text ("Dev: " ++ toString model.developmentStoryPointsNeeded ) ]
-             , span [ ] [ text ("/") ]
-             , span [ ] [ text (toString model.developmentStoryPointsCompleted ) ]
-             ]
-    , div [] [ span [ ] [ text ("Test: " ++ toString model.testingStoryPointsNeeded ) ]
-             , span [ ] [ text ("/") ]
-             , span [ ] [ text (toString model.testingStoryPointsCompleted ) ]
-             ]
-    ]
+  let
+    cssSelectCard = if model.selected then "green" else "white"
+  in
+    span [ (cardStyle cssSelectCard) , onClick context.actions ToggleSelectCard ]
+      [ renderNeedAndCompletedSP "An:" model.analyticStoryPointsNeeded model.analyticStoryPointsCompleted
+      , renderNeedAndCompletedSP "Dev:" model.developmentStoryPointsNeeded model.developmentStoryPointsCompleted
+      , renderNeedAndCompletedSP "Test:" model.testingStoryPointsNeeded model.testingStoryPointsCompleted
+      ]
 
 
-cardStyle : Attribute
-cardStyle =
+cardStyle : String -> Attribute
+cardStyle cssSelectCard =
   style
     [ ("font-size", "14px")
     , ("display", "inline-block")
     , ("width", "80px")
     , ("border", "1px dotted black")
     , ("text-align", "left")
+    , ("background-color", cssSelectCard)
     ]
 
+
+renderNeedAndCompletedSP : String -> Int -> Int -> Html
+renderNeedAndCompletedSP title needSP completedSP =
+  div [] [ span [ ] [ text (title ++ toString needSP) ]
+         , span [ ] [ text ("/") ]
+         , span [ ] [ text (toString completedSP) ]
+         ]

@@ -81,9 +81,14 @@ update action model =
       )
 
     Modify id cardAction ->
+      let updateCard (cardID, cardModel) =
+              if cardID == id then
+                  (cardID, Card.update cardAction cardModel)
+              else
+                (cardID, cardModel)
+      in
       (
-        { model | cards = List.filter (\(cardID, _) -> cardID /= id) model.cards
-        }
+        { model | cards = List.map updateCard model.cards }
       , Effects.none
       )
 
