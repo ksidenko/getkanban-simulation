@@ -62,6 +62,7 @@ view : Signal.Address Action -> Model -> Html
 view address model =
   div [ columnGroupStyle ]
     [ div [] [ text (model.columnGroupName ++ " (" ++ toString( model.wip ) ++ ")") ]
+    , hr [] []
     , Column.view (Signal.forwardTo address AddCardInProgress) model.inProgress
     , Column.view (Signal.forwardTo address AddCardDone) model.done
     ]
@@ -71,7 +72,8 @@ columnGroupStyle =
   style
     [ ("width", "30px")
     , ("display", "inline-block")
-    , ("width", "200px")
+    , ("width", "185px")
     , ("float", "left")
     , ("border", "1px solid green")
+    , ("margin-right", "10px")
     ]
