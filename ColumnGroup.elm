@@ -15,16 +15,17 @@ type alias Model =
     , done: Column.Model
     , wip: Int
     , columnGroupName: String
+    , onlyOneColumn: Bool
     }
 
 
-init : Int -> String -> (Model, Effects Action)
-init wip_ columnGroupName_ =
+init : Int -> String -> Bool -> (Model, Effects Action)
+init wip_ columnGroupName_ onlyOneColumn_ =
   let
     (inProgress, inProgressFx) = Column.init "In Progress"
     (done, doneFx) = Column.init "Done"
   in
-    ( Model inProgress done wip_ columnGroupName_
+    ( Model inProgress done wip_ columnGroupName_ onlyOneColumn_
     , Effects.batch
         [ Effects.map AddCardInProgress inProgressFx
         , Effects.map AddCardDone doneFx
@@ -44,7 +45,7 @@ update action model =
       let
         (inProgress_, fx_) = Column.update act model.inProgress
       in
-        ( Model inProgress_ model.done model.wip model.columnGroupName
+        ( Model inProgress_ model.done model.wip model.columnGroupName model.onlyOneColumn
         , Effects.map AddCardInProgress fx_
         )
 
@@ -52,7 +53,7 @@ update action model =
       let
         (done_, fx_) = Column.update act model.done
       in
-        ( Model model.inProgress  done_ model.wip model.columnGroupName
+        ( Model model.inProgress  done_ model.wip model.columnGroupName model.onlyOneColumn
         , Effects.map AddCardDone fx_
         )
 
@@ -60,19 +61,26 @@ update action model =
 
 view : Signal.Address Action -> Model -> Html
 view address model =
-  div [ columnGroupStyle ]
-    [ div [] [ text (model.columnGroupName ++ " (" ++ toString( model.wip ) ++ ")") ]
-    , hr [] []
-    , Column.view (Signal.forwardTo address AddCardInProgress) model.inProgress
-    , Column.view (Signal.forwardTo address AddCardDone) model.done
-    ]
+  let
+    columnHeader = div []
+      [ text (model.columnGroupName ++ " (" ++ toString( model.wip ) ++ ")")
+      , hr [] []
+      ]
+    columnsHtml1 = [Column.view (Signal.forwardTo address AddCardInProgress) model.inProgress]
+    columnsHtml2 = if model.onlyOneColumn == False then [Column.view (Signal.forwardTo address AddCardDone) model.done] else []
+  in
+    div [ columnGroupStyle ( getCssColumnWidth model.onlyOneColumn ) ] ( columnHeader::(List.append columnsHtml1 columnsHtml2 ))
 
-columnGroupStyle : Attribute
-columnGroupStyle =
+getCssColumnWidth : Bool -> String
+getCssColumnWidth onlyOneColumn =
+  if onlyOneColumn == True then "92px" else "185px"
+
+columnGroupStyle : String -> Attribute
+columnGroupStyle cssColumnWidth =
   style
     [ ("width", "30px")
     , ("display", "inline-block")
-    , ("width", "185px")
+    , ("width", cssColumnWidth )
     , ("float", "left")
     , ("border", "1px solid green")
     , ("margin-right", "10px")

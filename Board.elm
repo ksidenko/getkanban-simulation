@@ -21,11 +21,11 @@ type alias Model =
 init : Int -> Int -> Int -> Int -> Int -> (Model, Effects Action)
 init s a d t dd =
     let
-      (selected, selectedFx) = ColumnGroup.init s "Selected"
-      (analytic, analyticFx) = ColumnGroup.init a "Analytic"
-      (development, developmentFx) = ColumnGroup.init d "Development"
-      (testing, testingFx) = ColumnGroup.init t "Testing"
-      (deploy, deployFx) = ColumnGroup.init dd "Deploy"
+      (selected, selectedFx) = ColumnGroup.init s "Selected" True
+      (analytic, analyticFx) = ColumnGroup.init a "Analytic" False
+      (development, developmentFx) = ColumnGroup.init d "Development" False
+      (testing, testingFx) = ColumnGroup.init t "Testing" True
+      (deploy, deployFx) = ColumnGroup.init dd "Deploy" False
     in
       ( Model selected analytic development testing deploy
       , Effects.batch
