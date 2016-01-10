@@ -7,17 +7,23 @@ import Html.Events exposing (onClick)
 -- MODEL
 
 type alias Model =
-    { analyticStoryPointsAvailable : Int
-    , devStoryPointsAvailable  : Int
-    , testStoryPointsAvailable  : Int
+    { analyticStoryPointsNeeded : Int
+    , developmentStoryPointsNeeded  : Int
+    , testingStoryPointsNeeded  : Int
     , countDices : Int
+    , analyticStoryPointsCompleted : Int
+    , developmentStoryPointsCompleted  : Int
+    , testingStoryPointsCompleted  : Int
     }
 
 init : Int -> Int -> Int -> Int -> Model
 init a d t c =
-    { analyticStoryPointsAvailable = a
-    , devStoryPointsAvailable  = d
-    , testStoryPointsAvailable  = t
+    { analyticStoryPointsNeeded = a
+    , developmentStoryPointsNeeded  = d
+    , testingStoryPointsNeeded  = t
+    , analyticStoryPointsCompleted = 0
+    , developmentStoryPointsCompleted  = 0
+    , testingStoryPointsCompleted  = 0
     , countDices = c
     }
 
@@ -42,19 +48,29 @@ type alias Context =
 
 view: Context -> Model -> Html
 view context model =
-  span [ countStyle ]
-    [ span [ ] [ text (toString model.analyticStoryPointsAvailable ) ]
-    , span [ ] [ text (toString model.devStoryPointsAvailable) ]
-    , span [ ] [ text (toString model.testStoryPointsAvailable) ]
+  span [ cardStyle ]
+    [ div [] [ span [ ] [ text ("An: " ++ toString model.analyticStoryPointsNeeded ) ]
+             , span [ ] [ text ("/") ]
+             , span [ ] [ text (toString model.analyticStoryPointsCompleted ) ]
+             ]
+    , div [] [ span [ ] [ text ("Dev: " ++ toString model.developmentStoryPointsNeeded ) ]
+             , span [ ] [ text ("/") ]
+             , span [ ] [ text (toString model.developmentStoryPointsCompleted ) ]
+             ]
+    , div [] [ span [ ] [ text ("Test: " ++ toString model.testingStoryPointsNeeded ) ]
+             , span [ ] [ text ("/") ]
+             , span [ ] [ text (toString model.testingStoryPointsCompleted ) ]
+             ]
     ]
 
-countStyle : Attribute
-countStyle =
+
+cardStyle : Attribute
+cardStyle =
   style
-    [ ("font-size", "24px")
-    , ("font-family", "monospace")
+    [ ("font-size", "14px")
     , ("display", "inline-block")
-    , ("width", "50px")
+    , ("width", "80px")
     , ("border", "1px dotted black")
-    , ("text-align", "center")
+    , ("text-align", "left")
     ]
+
