@@ -10,11 +10,11 @@ type alias Model =
     { analyticStoryPointsNeeded : Int
     , developmentStoryPointsNeeded  : Int
     , testingStoryPointsNeeded  : Int
-    , countDices : Int
     , analyticStoryPointsCompleted : Int
     , developmentStoryPointsCompleted  : Int
     , testingStoryPointsCompleted  : Int
-    }
+    , countDices : Int
+   }
 
 init : Int -> Int -> Int -> Int -> Model
 init a d t c =
