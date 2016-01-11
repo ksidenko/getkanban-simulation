@@ -26,50 +26,25 @@ init columnName_ =
 -- UPDATE
 
 type Action
-    = SelectCard ID Card.Action
-    | DeselectCard ID Card.Action
-    | AddCard
-    | DelCard ID
+    = AddCard
     | Modify ID Card.Action
 
 
 update : Action -> Model -> Model
 update action model =
   case action of
-    SelectCard id cardAction ->
-      let updateCard (cardID, cardModel) =
-        if cardID == id then
-          (cardID, Card.update cardAction cardModel)
-        else
-          (cardID, cardModel)
-      in
-          { model | cards = List.map updateCard model.cards }
-
-    DeselectCard id cardAction ->
-      let updateCard (cardID, cardModel) =
-        if cardID == id then
-          (cardID, Card.update cardAction cardModel)
-        else
-          (cardID, cardModel)
-      in
-        { model | cards = List.map updateCard model.cards }
-
     AddCard ->
       { model |
           cards = ( model.nextID, Card.init 2 3 2 0 ) :: model.cards,
           nextID = model.nextID + 1
       }
 
-    DelCard id ->
-      { model | cards = List.filter (\(cardID, _) -> cardID /= id) model.cards
-      }
-
     Modify id cardAction ->
       let updateCard (cardID, cardModel) =
-              if cardID == id then
-                  (cardID, Card.update cardAction cardModel)
-              else
-                (cardID, cardModel)
+        if cardID == id then
+            (cardID, Card.update cardAction cardModel)
+        else
+          (cardID, cardModel)
       in
         { model | cards = List.map updateCard model.cards }
 
