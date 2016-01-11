@@ -1,6 +1,5 @@
 module Board where
 
-import Effects exposing (Effects, Never)
 import Html exposing (..)
 import Html.Attributes exposing (style)
 import Html.Events exposing (onClick)
@@ -18,25 +17,14 @@ type alias Model =
     }
 
 
-init : Int -> Int -> Int -> Int -> Int -> (Model, Effects Action)
+init : Int -> Int -> Int -> Int -> Int -> Model
 init s a d t dd =
-    let
-      (selected, selectedFx) = ColumnGroup.init s "Selected" True
-      (analytic, analyticFx) = ColumnGroup.init a "Analytic" False
-      (development, developmentFx) = ColumnGroup.init d "Development" False
-      (testing, testingFx) = ColumnGroup.init t "Testing" True
-      (deploy, deployFx) = ColumnGroup.init dd "Deploy" False
-    in
-      ( Model selected analytic development testing deploy
-      , Effects.batch
-        [ Effects.map SelectedAddCard selectedFx
-        , Effects.map AnalyticAddCard analyticFx
-        , Effects.map DevelopmentAddCard developmentFx
-        , Effects.map TestingAddCard testingFx
-        , Effects.map DeployAddCard deployFx
-        ]
-      )
-
+    { selected = ColumnGroup.init s "Selected" True
+    , analytic = ColumnGroup.init a "Analytic" False
+    , development = ColumnGroup.init d "Development" False
+    , testing = ColumnGroup.init t "Testing" True
+    , deploy = ColumnGroup.init dd "Deploy" False
+    }
 
 -- UPDATE
 
@@ -49,48 +37,28 @@ type Action
 
 
 
-update : Action -> Model -> (Model, Effects Action)
+update : Action -> Model -> Model
 update action model =
   case action of
     SelectedAddCard act ->
-      let
-        (selected_, fx_) = ColumnGroup.update act model.selected
-      in
-        ( Model selected_ model.analytic model.development model.testing model.deploy 
-        , Effects.map SelectedAddCard fx_
-        )
+      { model | selected = ColumnGroup.update act model.selected
+      }
 
     AnalyticAddCard act ->
-      let
-        (analytic_, fx_) = ColumnGroup.update act model.analytic
-      in
-        ( Model model.selected analytic_ model.development model.testing model.deploy 
-        , Effects.map AnalyticAddCard fx_
-        )
+      { model | analytic = ColumnGroup.update act model.analytic
+      }
 
     DevelopmentAddCard act ->
-      let
-        (development_, fx_) = ColumnGroup.update act model.development
-      in
-        ( Model model.selected model.analytic development_ model.testing model.deploy 
-        , Effects.map DevelopmentAddCard fx_
-        )
+      { model | development = ColumnGroup.update act model.development
+      }
 
     TestingAddCard act ->
-      let
-        (testing_, fx_) = ColumnGroup.update act model.testing
-      in
-        ( Model model.selected model.analytic model.development testing_ model.deploy 
-        , Effects.map TestingAddCard fx_
-        )
+      { model | testing = ColumnGroup.update act model.testing
+      }
 
     DeployAddCard act ->
-      let
-        (deploy_, fx_) = ColumnGroup.update act model.deploy
-      in
-        ( Model model.selected model.analytic model.development model.testing deploy_
-        , Effects.map DeployAddCard fx_
-        )
+      { model | deploy = ColumnGroup.update act model.deploy
+      }
 
 -- VIEW
 

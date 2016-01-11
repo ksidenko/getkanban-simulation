@@ -1,6 +1,5 @@
 module ColumnGroup where
 
-import Effects exposing (Effects, Never)
 import Html exposing (..)
 import Html.Attributes exposing (style)
 import Html.Events exposing (onClick)
@@ -19,18 +18,14 @@ type alias Model =
     }
 
 
-init : Int -> String -> Bool -> (Model, Effects Action)
+init : Int -> String -> Bool -> Model
 init wip_ columnGroupName_ onlyOneColumn_ =
-  let
-    (inProgress, inProgressFx) = Column.init "In Progress"
-    (done, doneFx) = Column.init "Done"
-  in
-    ( Model inProgress done wip_ columnGroupName_ onlyOneColumn_
-    , Effects.batch
-        [ Effects.map AddCardInProgress inProgressFx
-        , Effects.map AddCardDone doneFx
-        ]
-    )
+    { inProgress = Column.init "In Progress"
+    , done = Column.init "Done"
+    , wip = wip_
+    , columnGroupName = columnGroupName_
+    , onlyOneColumn = onlyOneColumn_
+    }
 
 -- UPDATE
 
@@ -38,24 +33,18 @@ type Action
     = AddCardInProgress Column.Action
     | AddCardDone Column.Action
 
-update : Action -> Model -> (Model, Effects Action)
+update : Action -> Model -> Model
 update action model =
   case action of
     AddCardInProgress act ->
-      let
-        (inProgress_, fx_) = Column.update act model.inProgress
-      in
-        ( Model inProgress_ model.done model.wip model.columnGroupName model.onlyOneColumn
-        , Effects.map AddCardInProgress fx_
-        )
+      { model |
+          inProgress = Column.update act model.inProgress
+      }
 
     AddCardDone act ->
-      let
-        (done_, fx_) = Column.update act model.done
-      in
-        ( Model model.inProgress  done_ model.wip model.columnGroupName model.onlyOneColumn
-        , Effects.map AddCardDone fx_
-        )
+      { model |
+          done = Column.update act model.done
+      }
 
 -- VIEW
 
