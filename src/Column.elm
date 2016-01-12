@@ -5,6 +5,7 @@ import Html.Attributes exposing (style)
 import Html.Events exposing (onClick)
 import Card
 
+
 -- MODEL
 
 type alias Model =
@@ -78,4 +79,3 @@ viewCard address (id, model) =
         (Signal.forwardTo address (Modify id))
   in
     Card.view context model
-
