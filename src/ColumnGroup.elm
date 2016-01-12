@@ -18,7 +18,7 @@ type alias Model =
     }
 
 
-init : Int -> String -> Bool -> Model
+init : Int -> String -> String -> Model
 init wip_ columnGroupName_ onlyOneColumn_ =
     { inProgress = Column.init "In Progress"
     , done = Column.init "Done"

@@ -4,36 +4,35 @@ import Html exposing (..)
 import Html.Attributes exposing (style)
 import Html.Events exposing (onClick)
 import Column exposing (Model, init, update, view)
-import ColumnGroup exposing (Model, init, update, view)
 
 -- MODEL
 
 type alias Model =
-    { selected : ColumnGroup.Model
-    , analytic: ColumnGroup.Model
-    , development: ColumnGroup.Model
-    , testing: ColumnGroup.Model
-    , deploy: ColumnGroup.Model
+    { selected : Column.Model
+    , analytic: Column.Model
+    , development: Column.Model
+    , testing: Column.Model
+    , deploy: Column.Model
     }
 
 
 init : Int -> Int -> Int -> Int -> Int -> Model
 init s a d t dd =
-    { selected = ColumnGroup.init s "Selected" True
-    , analytic = ColumnGroup.init a "Analytic" False
-    , development = ColumnGroup.init d "Development" False
-    , testing = ColumnGroup.init t "Testing" True
-    , deploy = ColumnGroup.init dd "Deploy" False
+    { selected = Column.init "Selected" 2 a True
+    , analytic = Column.init "Analytic" 3 a False
+    , development = Column.init "Development" 2 d False
+    , testing = Column.init "Testing" 2 t True
+    , deploy = Column.init "Deploy" 100 dd False
     }
 
 -- UPDATE
 
 type Action
-    = SelectedAddCard ColumnGroup.Action
-    | AnalyticAddCard ColumnGroup.Action
-    | DevelopmentAddCard ColumnGroup.Action
-    | TestingAddCard ColumnGroup.Action
-    | DeployAddCard ColumnGroup.Action
+    = SelectedAddCard Column.Action
+    | AnalyticAddCard Column.Action
+    | DevelopmentAddCard Column.Action
+    | TestingAddCard Column.Action
+    | DeployAddCard Column.Action
 
 
 
@@ -41,23 +40,23 @@ update : Action -> Model -> Model
 update action model =
   case action of
     SelectedAddCard act ->
-      { model | selected = ColumnGroup.update act model.selected
+      { model | selected = Column.update act model.selected
       }
 
     AnalyticAddCard act ->
-      { model | analytic = ColumnGroup.update act model.analytic
+      { model | analytic = Column.update act model.analytic
       }
 
     DevelopmentAddCard act ->
-      { model | development = ColumnGroup.update act model.development
+      { model | development = Column.update act model.development
       }
 
     TestingAddCard act ->
-      { model | testing = ColumnGroup.update act model.testing
+      { model | testing = Column.update act model.testing
       }
 
     DeployAddCard act ->
-      { model | deploy = ColumnGroup.update act model.deploy
+      { model | deploy = Column.update act model.deploy
       }
 
 -- VIEW
@@ -66,9 +65,9 @@ view : Signal.Address Action -> Model -> Html
 view address model =
   div []
     [ div [] [ text "" ]
-    , ColumnGroup.view (Signal.forwardTo address SelectedAddCard) model.selected
-    , ColumnGroup.view (Signal.forwardTo address AnalyticAddCard) model.analytic
-    , ColumnGroup.view (Signal.forwardTo address DevelopmentAddCard) model.development
-    , ColumnGroup.view (Signal.forwardTo address TestingAddCard) model.testing
-    , ColumnGroup.view (Signal.forwardTo address DeployAddCard) model.deploy
+    , Column.view (Signal.forwardTo address SelectedAddCard) model.selected
+    , Column.view (Signal.forwardTo address AnalyticAddCard) model.analytic
+    , Column.view (Signal.forwardTo address DevelopmentAddCard) model.development
+    , Column.view (Signal.forwardTo address TestingAddCard) model.testing
+    , Column.view (Signal.forwardTo address DeployAddCard) model.deploy
     ]

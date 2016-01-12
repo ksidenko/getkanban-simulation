@@ -10,18 +10,24 @@ import Card
 
 type alias Model =
     { cards: List ( ID, Card.Model )
-    , columnName: String
     , nextID : ID
+    , name: String
+    , dicesCount: Int
+    , wipLimit: Int
+    , hasDone: Bool
     }
 
 type alias ID = Int
 
 
-init : String -> Model
-init columnName_ =
+init : String -> Int -> Int -> Bool -> Model
+init name dicesCount wipLimit hasDone =
     { cards = []
-    , columnName = columnName_
     , nextID = 0
+    , name = name
+    , dicesCount = dicesCount
+    , wipLimit = wipLimit
+    , hasDone = hasDone
     }
 
 -- UPDATE
@@ -55,7 +61,7 @@ view : Signal.Address Action -> Model -> Html
 view address model =
     let
       insert = div []
-        [ div [] [ text model.columnName ]
+        [ div [] [ text model.name ]
         , button [ onClick address AddCard ] [ text "Add Card" ]
         , hr [] []
         ]
