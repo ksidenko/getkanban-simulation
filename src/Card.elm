@@ -1,32 +1,24 @@
 module Card where
 
 import Html exposing (..)
-import Html.Attributes exposing (style)
-import Html.Events exposing (onClick)
+import Html.Attributes exposing (..)
+import Html.Events exposing (..)
 
 -- MODEL
 
 type alias Model =
-    { analyticStoryPointsNeeded : Int
-    , developmentStoryPointsNeeded  : Int
-    , testingStoryPointsNeeded  : Int
-    , analyticStoryPointsCompleted : Int
-    , developmentStoryPointsCompleted  : Int
-    , testingStoryPointsCompleted  : Int
-    , countDices : Int
-    , selected : Bool
-   }
+    { analyticPoints : (Int, Int)
+    , developmentPoints : (Int, Int)
+    , testingPoints : (Int, Int)
+    , dicesCount : Int
+    }
 
-init : Int -> Int -> Int -> Int -> Model
-init a d t c =
-    { analyticStoryPointsNeeded = a
-    , developmentStoryPointsNeeded  = d
-    , testingStoryPointsNeeded  = t
-    , analyticStoryPointsCompleted = 0
-    , developmentStoryPointsCompleted  = 0
-    , testingStoryPointsCompleted  = 0
-    , countDices = c
-    , selected = False
+init : Int -> Int -> Int -> Model
+init analiticLimit developmentLimit testingLimit =
+    { analyticPoints = (0, analiticLimit)
+    , developmentPoints = (0, developmentLimit)
+    , testingPoints = (0, testingLimit)
+    , dicesCount = 0
     }
 
 -- UPDATE
@@ -38,7 +30,7 @@ update : Action -> Model -> Model
 update action model =
   case action of
     ToggleSelectCard ->
-      { model | selected = not model.selected }
+      { model | dicesCount = model.dicesCount + 1 }
 
 -- VIEW
 
@@ -49,12 +41,12 @@ type alias Context =
 view : Context -> Model -> Html
 view context model =
   let
-    cssSelectCard = if model.selected then "green" else "white"
+    cssSelectCard = if model.dicesCount > 0 then "green" else "white"
   in
-    span [ (cardStyle cssSelectCard) , onClick context.actions ToggleSelectCard ]
-      [ renderNeedAndCompletedSP "An:" model.analyticStoryPointsNeeded model.analyticStoryPointsCompleted
-      , renderNeedAndCompletedSP "Dev:" model.developmentStoryPointsNeeded model.developmentStoryPointsCompleted
-      , renderNeedAndCompletedSP "Test:" model.testingStoryPointsNeeded model.testingStoryPointsCompleted
+    span [ (cardStyle cssSelectCard), onClick context.actions ToggleSelectCard ]
+      [ renderPoints "An:" model.analyticPoints
+      , renderPoints "Dev:" model.developmentPoints
+      , renderPoints "Test:" model.testingPoints
       ]
 
 
@@ -69,10 +61,9 @@ cardStyle cssSelectCard =
     , ("background-color", cssSelectCard)
     ]
 
-
-renderNeedAndCompletedSP : String -> Int -> Int -> Html
-renderNeedAndCompletedSP title needSP completedSP =
-  div [] [ span [ ] [ text (title ++ toString needSP) ]
+renderPoints : String -> (Int, Int) -> Html
+renderPoints title points =
+  div [] [ span [ ] [ text (title ++ toString (fst points)) ]
          , span [ ] [ text ("/") ]
-         , span [ ] [ text (toString completedSP) ]
+         , span [ ] [ text (toString (snd points)) ]
          ]

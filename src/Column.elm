@@ -36,7 +36,7 @@ update action model =
   case action of
     AddCard ->
       { model |
-          cards = ( model.nextID, Card.init 2 3 2 0 ) :: model.cards,
+          cards = ( model.nextID, Card.init 2 3 2 ) :: model.cards,
           nextID = model.nextID + 1
       }
 
