@@ -13,11 +13,11 @@ type alias Model =
     , dicesCount : Int
     }
 
-init : Int -> Int -> Int -> Model
-init analiticLimit developmentLimit testingLimit =
-    { analyticPoints = (0, analiticLimit)
-    , developmentPoints = (0, developmentLimit)
-    , testingPoints = (0, testingLimit)
+init : (Int, Int, Int) -> Model
+init (anLimit, devLimit, testLimit) =
+    { analyticPoints = (0, anLimit)
+    , developmentPoints = (0, devLimit)
+    , testingPoints = (0, testLimit)
     , dicesCount = 0
     }
 
@@ -40,30 +40,29 @@ type alias Context =
 
 view : Context -> Model -> Html
 view context model =
-  let
-    cssSelectCard = if model.dicesCount > 0 then "green" else "white"
-  in
-    span [ (cardStyle cssSelectCard), onClick context.actions ToggleSelectCard ]
-      [ renderPoints "An:" model.analyticPoints
-      , renderPoints "Dev:" model.developmentPoints
-      , renderPoints "Test:" model.testingPoints
-      ]
+    let bgColor = if model.dicesCount > 0 then "green" else "white"
+    in
+        span [ cardStyle bgColor, onClick context.actions ToggleSelectCard ]
+            [ pointsView "An:" model.analyticPoints
+            , pointsView "Dev:" model.developmentPoints
+            , pointsView "Test:" model.testingPoints
+            ]
 
+pointsView : String -> (Int, Int) -> Html
+pointsView title points =
+    div []
+        [ span [] [ text (title ++ toString (fst points)) ]
+        , span [] [ text "/" ]
+        , span [] [ text (toString (snd points)) ]
+        ]
 
 cardStyle : String -> Attribute
-cardStyle cssSelectCard =
-  style
-    [ ("font-size", "14px")
-    , ("display", "inline-block")
-    , ("width", "80px")
-    , ("border", "1px dotted black")
-    , ("text-align", "left")
-    , ("background-color", cssSelectCard)
-    ]
-
-renderPoints : String -> (Int, Int) -> Html
-renderPoints title points =
-  div [] [ span [ ] [ text (title ++ toString (fst points)) ]
-         , span [ ] [ text ("/") ]
-         , span [ ] [ text (toString (snd points)) ]
-         ]
+cardStyle bgColor =
+    style
+        [ ("font-size", "14px")
+        , ("display", "inline-block")
+        , ("width", "80px")
+        , ("border", "1px dotted black")
+        , ("text-align", "left")
+        , ("background-color", bgColor)
+        ]
