@@ -7,17 +7,17 @@ import Html.Events exposing (..)
 -- MODEL
 
 type alias Model =
-    { analyticPoints : (Int, Int)
-    , developmentPoints : (Int, Int)
-    , testingPoints : (Int, Int)
+    { analyticStoryPoints : (Int, Int)
+    , developmentStoryPoints : (Int, Int)
+    , testingStoryPoints : (Int, Int)
     , dicesCount : Int
     }
 
 init : (Int, Int, Int) -> Model
 init (anLimit, devLimit, testLimit) =
-    { analyticPoints = (0, anLimit)
-    , developmentPoints = (0, devLimit)
-    , testingPoints = (0, testLimit)
+    { analyticStoryPoints = (0, anLimit)
+    , developmentStoryPoints = (0, devLimit)
+    , testingStoryPoints = (0, testLimit)
     , dicesCount = 0
     }
 
@@ -43,17 +43,17 @@ view context model =
     let bgColor = if model.dicesCount > 0 then "green" else "white"
     in
         span [ cardStyle bgColor, onClick context.actions ToggleSelectCard ]
-            [ pointsView "An:" model.analyticPoints
-            , pointsView "Dev:" model.developmentPoints
-            , pointsView "Test:" model.testingPoints
+            [ storyPointsView "An:" model.analyticStoryPoints
+            , storyPointsView "Dev:" model.developmentStoryPoints
+            , storyPointsView "Test:" model.testingStoryPoints
             ]
 
-pointsView : String -> (Int, Int) -> Html
-pointsView title points =
+storyPointsView : String -> (Int, Int) -> Html
+storyPointsView title storyPoints =
     div []
-        [ span [] [ text (title ++ toString (fst points)) ]
+        [ span [] [ text (title ++ toString (fst storyPoints)) ]
         , span [] [ text "/" ]
-        , span [] [ text (toString (snd points)) ]
+        , span [] [ text (toString (snd storyPoints)) ]
         ]
 
 cardStyle : String -> Attribute
