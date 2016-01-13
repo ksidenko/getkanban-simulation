@@ -1,4 +1,4 @@
-module Column(Model, init, Action, update, view) where
+module Column (Model, init, Action, update, view) where
 
 import Html exposing (..)
 import Html.Attributes exposing (style)
@@ -59,18 +59,27 @@ update action model =
 
 view : Signal.Address Action -> Model -> Html
 view address model =
-    let
-      insert = div []
-        [ div [] [ text ( model.name ++ " (" ++ toString(model.wipLimit) ++ ")") ]
-        , hr [] []
-        , div [] [ text ( "Dices: " ++ toString (model.dicesCount ) )]
-        , hr [] []
-        , button [ onClick address AddCard ] [ text "Add Card" ]
-        , hr [] []
-        ]
-    in
-      div [ columnStyle ] (insert :: List.map (viewCard address) model.cards)
+  div [ columnStyle ]
+    [ viewHeader address model 
+    , viewBtn address model 
+    , div [] (List.map (viewCard address) model.cards)
+    ]
 
+viewBtn : Signal.Address Action -> Model -> Html
+viewBtn address model =
+  div []
+    [ button [ onClick address AddCard ] [ text "Add Card" ]
+    , hr [] []
+    ]
+
+viewHeader : Signal.Address Action -> Model -> Html
+viewHeader address model =
+  div []
+    [ div [] [ text ( model.name ++ " (" ++ toString(model.wipLimit) ++ ")") ]
+    , hr [] []
+    , div [] [ text ( "Dices: " ++ toString (model.dicesCount ) )]
+    , hr [] []
+    ]
 
 columnStyle : Attribute
 columnStyle =
