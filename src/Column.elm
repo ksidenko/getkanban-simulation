@@ -61,7 +61,10 @@ view : Signal.Address Action -> Model -> Html
 view address model =
     let
       insert = div []
-        [ div [] [ text (model.name ++ " (" ++ toString(model.wipLimit) ++ ")") ]
+        [ div [] [ text ( model.name ++ " (" ++ toString(model.wipLimit) ++ ")") ]
+        , hr [] []
+        , div [] [ text ( "Dices: " ++ toString (model.dicesCount ) )]
+        , hr [] []
         , button [ onClick address AddCard ] [ text "Add Card" ]
         , hr [] []
         ]
