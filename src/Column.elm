@@ -59,11 +59,34 @@ update action model =
 
 view : Signal.Address Action -> Model -> Html
 view address model =
-  div [ columnStyle ]
-    [ viewHeader address model 
-    , viewBtn address model 
-    , div [] (List.map (viewCard address) model.cards)
+  let
+    width = (\hasDone -> if hasDone == False then 92 else 185) model.hasDone 
+  in
+  div [ columnStyle width ]
+    [ viewHeader address model
+    , viewColumn address model
     ]
+
+viewColumn : Signal.Address Action -> Model -> String -> Html
+viewColumn address model widthCss =
+  let
+      column = viewCardList address model
+  in
+    div [ columnStyle widthCss ] [ column ]
+
+columnStyle : String -> Attribute
+columnStyle cssColumnWidth =
+  style
+    [ ("display", "inline-block")
+    , ("width", toString(cssColumnWidth) ++ "px")
+    , ("float", "left")
+    , ("border", "1px solid green")
+    , ("margin-right", "10px")
+    ]
+
+viewCardList : Signal.Address Action -> Model -> Html
+viewCardList address model =
+  div [] (List.map (viewCard address) model.cards)
 
 viewBtn : Signal.Address Action -> Model -> Html
 viewBtn address model =
@@ -79,16 +102,9 @@ viewHeader address model =
     , hr [] []
     , div [] [ text ( "Dices: " ++ toString (model.dicesCount ) )]
     , hr [] []
+    , viewBtn address model
     ]
 
-columnStyle : Attribute
-columnStyle =
-  style
-    [ ("display", "block")
-    , ("float", "left")
-    , ("width", "90px")
-    , ("border", "1px solid black")
-    ]
 
 viewCard : Signal.Address Action -> (ID, Card.Model) -> Html
 viewCard address (id, model) =
