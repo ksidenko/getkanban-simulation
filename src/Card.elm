@@ -49,11 +49,11 @@ view context model =
             ]
 
 storyPointsView : String -> (Int, Int) -> Html
-storyPointsView title storyPoints =
+storyPointsView title (neededStoryPoints, completedStoryPoints) =
     div []
-        [ span [] [ text (title ++ toString (fst storyPoints)) ]
+        [ span [] [ text (title ++ toString neededStoryPoints) ]
         , span [] [ text "/" ]
-        , span [] [ text (toString (snd storyPoints)) ]
+        , span [] [ text (toString completedStoryPoints) ]
         ]
 
 cardStyle : String -> Attribute
