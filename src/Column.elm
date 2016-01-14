@@ -72,16 +72,8 @@ headerView address model =
   div []
     [ div [] [ text ( model.name ++ " (" ++ toString(model.wipLimit) ++ ")") ]
     , hr [] []
-    , div [] [ text ( "Dices: " ++ toString (model.dicesCount ) )
-             , btnView address model
-             ]
-    ]
-
-btnView : Signal.Address Action -> Model -> Html
-btnView address model =
-  div []
-    [ button [ onClick address AddCard ] [ text "Add Card" ]
-    , hr [] []
+    , div [] [ text ( "Dices: " ++ toString (model.dicesCount ) ) ]
+    , div [] [ button [ onClick address AddCard ] [ text "Add Card" ] ]
     ]
 
 columnView : Signal.Address Action -> Model -> Int -> Html
@@ -120,11 +112,7 @@ columnStyle cssColumnWidth =
 oneColumnView : Signal.Address Action -> Model -> Int -> List ( ID, Card.Model) -> Html
 oneColumnView address model widthCss cards =
   div [ columnStyle (widthCss) ]
-    [ cardListView address model cards ]
-
-cardListView : Signal.Address Action -> Model -> List ( ID, Card.Model) -> Html
-cardListView address model cards =
-  div [] (List.map (cardView address) cards)
+    [ div [] (List.map (cardView address) cards) ]
 
 cardView : Signal.Address Action -> (ID, Card.Model) -> Html
 cardView address (id, model) =
