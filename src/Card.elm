@@ -30,7 +30,7 @@ update : Action -> Model -> Model
 update action model =
   case action of
     ToggleSelectCard ->
-      { model | dicesCount = model.dicesCount + 1 }
+      { model | dicesCount = if model.dicesCount == 1 then 0 else 1 }
 
 -- VIEW
 
