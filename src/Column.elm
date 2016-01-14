@@ -63,18 +63,33 @@ view address model =
     width = (\hasDone -> if hasDone == False then 92 else 185) model.hasDone 
   in
   div [ columnStyle width ]
-    [ viewHeader address model
-    , viewColumn address model
+    [ headerView address model
+    , columnView address model width
     ]
 
-viewColumn : Signal.Address Action -> Model -> String -> Html
-viewColumn address model widthCss =
-  let
-      column = viewCardList address model
-  in
-    div [ columnStyle widthCss ] [ column ]
+headerView : Signal.Address Action -> Model -> Html
+headerView address model =
+  div []
+    [ div [] [ text ( model.name ++ " (" ++ toString(model.wipLimit) ++ ")") ]
+    , hr [] []
+    , div [] [ text ( "Dices: " ++ toString (model.dicesCount ) )]
+    , hr [] []
+    , btnView address model
+    ]
 
-columnStyle : String -> Attribute
+btnView : Signal.Address Action -> Model -> Html
+btnView address model =
+  div []
+    [ button [ onClick address AddCard ] [ text "Add Card" ]
+    , hr [] []
+    ]
+
+columnView : Signal.Address Action -> Model -> Int -> Html
+columnView address model widthCss =
+  div [ columnStyle (widthCss//2) ]
+    [ cardListView address model ]
+
+columnStyle : Int -> Attribute
 columnStyle cssColumnWidth =
   style
     [ ("display", "inline-block")
@@ -84,32 +99,15 @@ columnStyle cssColumnWidth =
     , ("margin-right", "10px")
     ]
 
-viewCardList : Signal.Address Action -> Model -> Html
-viewCardList address model =
-  div [] (List.map (viewCard address) model.cards)
+cardListView : Signal.Address Action -> Model -> Html
+cardListView address model =
+  div [] (List.map (cardView address) model.cards)
 
-viewBtn : Signal.Address Action -> Model -> Html
-viewBtn address model =
-  div []
-    [ button [ onClick address AddCard ] [ text "Add Card" ]
-    , hr [] []
-    ]
-
-viewHeader : Signal.Address Action -> Model -> Html
-viewHeader address model =
-  div []
-    [ div [] [ text ( model.name ++ " (" ++ toString(model.wipLimit) ++ ")") ]
-    , hr [] []
-    , div [] [ text ( "Dices: " ++ toString (model.dicesCount ) )]
-    , hr [] []
-    , viewBtn address model
-    ]
-
-
-viewCard : Signal.Address Action -> (ID, Card.Model) -> Html
-viewCard address (id, model) =
+cardView : Signal.Address Action -> (ID, Card.Model) -> Html
+cardView address (id, model) =
   let context =
     Card.Context
         (Signal.forwardTo address (Modify id))
   in
     Card.view context model
+
