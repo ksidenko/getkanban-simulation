@@ -60,7 +60,7 @@ update action model =
 view : Signal.Address Action -> Model -> Html
 view address model =
   let
-    width = (\hasDone -> if hasDone == False then 92 else 185) model.hasDone 
+    width = (\hasDone -> if hasDone == False then 92 else 185) model.hasDone
   in
   div [ columnStyle width ]
     [ headerView address model
@@ -72,9 +72,9 @@ headerView address model =
   div []
     [ div [] [ text ( model.name ++ " (" ++ toString(model.wipLimit) ++ ")") ]
     , hr [] []
-    , div [] [ text ( "Dices: " ++ toString (model.dicesCount ) )]
-    , hr [] []
-    , btnView address model
+    , div [] [ text ( "Dices: " ++ toString (model.dicesCount ) )
+             , btnView address model
+             ]
     ]
 
 btnView : Signal.Address Action -> Model -> Html
@@ -86,8 +86,26 @@ btnView address model =
 
 columnView : Signal.Address Action -> Model -> Int -> Html
 columnView address model widthCss =
-  div [ columnStyle (widthCss//2) ]
-    [ cardListView address model ]
+  let
+    widthOffset = 12
+    dividedCards = if model.hasDone then divideCards model.name model.cards else [ model.cards ]
+    widthOneColumn = if model.hasDone == True then (widthCss // 2 - widthOffset ) else (widthCss - widthOffset)
+  in
+    div [] ( List.map ( oneColumnView address model widthOneColumn ) dividedCards )
+
+divideCards : String -> List ( ID, Card.Model ) ->  List (List ( ID, Card.Model ) )
+divideCards columnName cards =
+  let
+    f columnName (_, card) =
+        case columnName of
+          "Analytic" -> (fst card.analyticStoryPoints) /= (snd card.analyticStoryPoints)
+          "Development " -> (fst card.developmentStoryPoints) /= (snd card.developmentStoryPoints)
+          _ ->  True
+
+    (inProgress, done) = List.partition (f columnName) cards
+  in
+    [inProgress, done]
+
 
 columnStyle : Int -> Attribute
 columnStyle cssColumnWidth =
@@ -99,9 +117,14 @@ columnStyle cssColumnWidth =
     , ("margin-right", "10px")
     ]
 
-cardListView : Signal.Address Action -> Model -> Html
-cardListView address model =
-  div [] (List.map (cardView address) model.cards)
+oneColumnView : Signal.Address Action -> Model -> Int -> List ( ID, Card.Model) -> Html
+oneColumnView address model widthCss cards =
+  div [ columnStyle (widthCss) ]
+    [ cardListView address model cards ]
+
+cardListView : Signal.Address Action -> Model -> List ( ID, Card.Model) -> Html
+cardListView address model cards =
+  div [] (List.map (cardView address) cards)
 
 cardView : Signal.Address Action -> (ID, Card.Model) -> Html
 cardView address (id, model) =

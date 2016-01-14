@@ -18,10 +18,10 @@ type alias Model =
 
 init : Int -> Int -> Int -> Int -> Int -> Model
 init s a d t dd =
-    { selected = Column.init "Selected" 2 a True
-    , analytic = Column.init "Analytic" 3 a False
-    , development = Column.init "Development" 2 d False
-    , testing = Column.init "Testing" 2 t True
+    { selected = Column.init "Selected" 2 a False
+    , analytic = Column.init "Analytic" 3 a True
+    , development = Column.init "Development" 2 d True
+    , testing = Column.init "Testing" 2 t False
     , deploy = Column.init "Deploy" 100 dd False
     }
 
