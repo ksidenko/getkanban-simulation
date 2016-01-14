@@ -1,5 +1,7 @@
 module Card where
 
+import Dict exposing (..)
+
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
@@ -7,18 +9,17 @@ import Html.Events exposing (..)
 -- MODEL
 
 type alias Model =
-    { analyticStoryPoints : (Int, Int)
-    , developmentStoryPoints : (Int, Int)
-    , testingStoryPoints : (Int, Int)
-    , dicesCount : Int
+    { dicesCount : Int
+    , storyPoints : List (String, String, Int, Int)
     }
 
 init : (Int, Int, Int) -> Model
 init (anLimit, devLimit, testLimit) =
-    { analyticStoryPoints = (0, anLimit)
-    , developmentStoryPoints = (0, devLimit)
-    , testingStoryPoints = (0, testLimit)
-    , dicesCount = 0
+    { dicesCount = 0
+    , storyPoints = [ ("Analytic", "an: ", 2, anLimit)
+                    , ("Development", "dev: ", 0, devLimit)
+                    , ("Testing", "test: ", 0, testLimit)
+                    ]
     }
 
 -- UPDATE
@@ -43,18 +44,15 @@ view context model =
     let bgColor = if model.dicesCount > 0 then "green" else "white"
     in
         span [ cardStyle bgColor, onClick context.actions ToggleSelectCard ]
-            [ storyPointsView "An:" model.analyticStoryPoints
-            , storyPointsView "Dev:" model.developmentStoryPoints
-            , storyPointsView "Test:" model.testingStoryPoints
-            ]
+        ( List.map storyPointsView model.storyPoints )
 
-storyPointsView : String -> (Int, Int) -> Html
-storyPointsView title (neededStoryPoints, completedStoryPoints) =
+storyPointsView : (String, String, Int, Int) -> Html
+storyPointsView (title, shortTitle, neededStoryPoints, completedStoryPoints) =
     div []
-        [ span [] [ text (title ++ toString neededStoryPoints) ]
-        , span [] [ text "/" ]
-        , span [] [ text (toString completedStoryPoints) ]
-        ]
+      [ span [] [ text (shortTitle ++ toString neededStoryPoints) ]
+      , span [] [ text "/" ]
+      , span [] [ text (toString completedStoryPoints) ]
+      ]
 
 cardStyle : String -> Attribute
 cardStyle bgColor =

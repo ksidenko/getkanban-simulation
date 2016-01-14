@@ -89,10 +89,15 @@ divideCards : String -> List ( ID, Card.Model ) ->  List (List ( ID, Card.Model 
 divideCards columnName cards =
   let
     f columnName (_, card) =
-        case columnName of
-          "Analytic" -> (fst card.analyticStoryPoints) /= (snd card.analyticStoryPoints)
-          "Development " -> (fst card.developmentStoryPoints) /= (snd card.developmentStoryPoints)
-          _ ->  True
+      let
+        ff columnName (name, _, _, _) = columnName == name
+
+        spInfo  = List.filter (ff columnName ) card.storyPoints
+      in
+        case spInfo of
+          [] -> True
+          [(name, shortName, a, b)] -> a /= b
+          _ -> True
 
     (inProgress, done) = List.partition (f columnName) cards
   in
