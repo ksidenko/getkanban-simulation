@@ -3,8 +3,9 @@ module Column (Model, init, Action, update, view) where
 import Html exposing (..)
 import Html.Attributes exposing (style)
 import Html.Events exposing (onClick)
-import Card
 
+import Card
+import Column.Header
 
 -- MODEL
 
@@ -61,9 +62,13 @@ view : Signal.Address Action -> Model -> Html
 view address model =
   let
     width = (\hasDone -> if hasDone == False then 92 else 185) model.hasDone
+    --context =
+        --Column.Header.Context
+          --(Signal.forwardTo address (AddCard))
   in
   div [ columnStyle width ]
     [ headerView address model
+    --Column.Header.view context model
     , columnView address model width
     ]
 
