@@ -1,26 +1,37 @@
 module Card where
 
-import Dict exposing (..)
-
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
+import Dict exposing (Dict)
+
+import Card.StoryPoints as StoryPoints
 
 -- MODEL
 
 type alias Model =
     { dicesCount : Int
-    , storyPoints : List (String, String, Int, Int)
+    , storyPoints : Dict String StoryPoints.Model
     }
 
 init : (Int, Int, Int) -> Model
 init (anLimit, devLimit, testLimit) =
     { dicesCount = 0
-    , storyPoints = [ ("Analytic", "an: ", 2, anLimit)
-                    , ("Development", "dev: ", 0, devLimit)
-                    , ("Testing", "test: ", 0, testLimit)
-                    ]
+    , storyPoints =
+        Dict.fromList
+            [ ("Analytic", StoryPoints.init anLimit)
+            , ("Development", StoryPoints.init devLimit)
+            , ("Testing", StoryPoints.init testLimit)
+            ]
     }
+
+isDone : String -> Model -> Bool
+isDone storyPointsTitle model =
+    let pointsForCheck = Dict.get storyPointsTitle model.storyPoints
+    in
+        case pointsForCheck of
+            Just points -> StoryPoints.isDone points
+            Nothing -> Debug.crash "ololo"
 
 -- UPDATE
 
@@ -44,15 +55,10 @@ view context model =
     let bgColor = if model.dicesCount > 0 then "green" else "white"
     in
         span [ cardStyle bgColor, onClick context.actions ToggleSelectCard ]
-        ( List.map storyPointsView model.storyPoints )
-
-storyPointsView : (String, String, Int, Int) -> Html
-storyPointsView (title, shortTitle, neededStoryPoints, completedStoryPoints) =
-    div []
-      [ span [] [ text (shortTitle ++ toString neededStoryPoints) ]
-      , span [] [ text "/" ]
-      , span [] [ text (toString completedStoryPoints) ]
-      ]
+            [ StoryPoints.view "An" (Maybe.withDefault (-1, -1) (Dict.get "Analytic" model.storyPoints))
+            , StoryPoints.view "Dev" (Maybe.withDefault (-1, -1) (Dict.get "Development" model.storyPoints))
+            , StoryPoints.view "Test" (Maybe.withDefault (-1, -1) (Dict.get "Testing" model.storyPoints))
+            ]
 
 cardStyle : String -> Attribute
 cardStyle bgColor =

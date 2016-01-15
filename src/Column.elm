@@ -78,29 +78,13 @@ headerView address model =
 
 columnView : Signal.Address Action -> Model -> Int -> Html
 columnView address model widthCss =
-  let
-    widthOffset = 12
-    dividedCards = if model.hasDone then divideCards model.name model.cards else [ model.cards ]
-    widthOneColumn = if model.hasDone == True then (widthCss // 2 - widthOffset ) else (widthCss - widthOffset)
-  in
-    div [] ( List.map ( oneColumnView address model widthOneColumn ) dividedCards )
-
-divideCards : String -> List ( ID, Card.Model ) ->  List (List ( ID, Card.Model ) )
-divideCards columnName cards =
-  let
-    f columnName (_, card) =
-      let
-        spInfo = card.storyPoints
-               |> List.filter ( columnName |> ( \columnName (name, _, _, _) -> columnName == name) )
-      in
-        case spInfo of
-          [(_, _, currValue, limitValue)] -> currValue /= limitValue
-          _ -> True
-
-    (inProgress, done) = List.partition (f columnName) cards
-  in
-    [inProgress, done]
-
+    if model.hasDone then
+        div [] [ oneColumnView address model.cards 80]
+    else
+        div []
+            [ oneColumnView address model.cards 80
+            , oneColumnView address model.cards 80
+            ]
 
 columnStyle : Int -> Attribute
 columnStyle cssColumnWidth =
@@ -112,10 +96,11 @@ columnStyle cssColumnWidth =
     , ("margin-right", "10px")
     ]
 
-oneColumnView : Signal.Address Action -> Model -> Int -> List ( ID, Card.Model) -> Html
-oneColumnView address model widthCss cards =
+oneColumnView : Signal.Address Action -> List (ID, Card.Model) -> Int -> Html
+oneColumnView address cards widthCss =
   div [ columnStyle (widthCss) ]
-    [ div [] (List.map (cardView address) cards) ]
+    [ div [] (List.map (cardView address) cards)
+    ]
 
 cardView : Signal.Address Action -> (ID, Card.Model) -> Html
 cardView address (id, model) =
@@ -124,4 +109,3 @@ cardView address (id, model) =
         (Signal.forwardTo address (Modify id))
   in
     Card.view context model
-
