@@ -90,13 +90,11 @@ divideCards columnName cards =
   let
     f columnName (_, card) =
       let
-        ff columnName (name, _, _, _) = columnName == name
-
-        spInfo  = List.filter (ff columnName ) card.storyPoints
+        spInfo = card.storyPoints
+               |> List.filter ( columnName |> ( \columnName (name, _, _, _) -> columnName == name) )
       in
         case spInfo of
-          [] -> True
-          [(name, shortName, a, b)] -> a /= b
+          [(_, _, currValue, limitValue)] -> currValue /= limitValue
           _ -> True
 
     (inProgress, done) = List.partition (f columnName) cards
