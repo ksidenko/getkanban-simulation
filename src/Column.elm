@@ -83,7 +83,7 @@ headerView address model =
 
 columnView : Signal.Address Action -> Model -> Int -> Html
 columnView address model widthCss =
-    if model.hasDone then
+    if not model.hasDone then
         div [] [ oneColumnView address model.cards 80]
     else
         div []
