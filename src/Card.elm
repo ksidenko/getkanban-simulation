@@ -25,13 +25,20 @@ init (anLimit, devLimit, testLimit) =
             ]
     }
 
+getStoryPoints : String -> Model -> StoryPoints.Model
+getStoryPoints storyPointsTitle model =
+  let pointsForCheck = Dict.get storyPointsTitle model.storyPoints
+  in
+    case pointsForCheck of
+      Just points -> points
+      Nothing -> Debug.crash ("Debug.crash info message: no such Story Point title " ++ storyPointsTitle )
+
+
 isDone : String -> Model -> Bool
 isDone storyPointsTitle model =
-    let pointsForCheck = Dict.get storyPointsTitle model.storyPoints
-    in
-        case pointsForCheck of
-            Just points -> StoryPoints.isDone points
-            Nothing -> Debug.crash "ololo"
+  getStoryPoints storyPointsTitle model
+    |> StoryPoints.isDone
+
 
 -- UPDATE
 
@@ -52,12 +59,13 @@ type alias Context =
 
 view : Context -> Model -> Html
 view context model =
-    let bgColor = if model.dicesCount > 0 then "green" else "white"
+    let 
+      bgColor = if model.dicesCount > 0 then "green" else "white"
     in
         span [ cardStyle bgColor, onClick context.actions ToggleSelectCard ]
-            [ StoryPoints.view "An" (Maybe.withDefault (-1, -1) (Dict.get "Analytic" model.storyPoints))
-            , StoryPoints.view "Dev" (Maybe.withDefault (-1, -1) (Dict.get "Development" model.storyPoints))
-            , StoryPoints.view "Test" (Maybe.withDefault (-1, -1) (Dict.get "Testing" model.storyPoints))
+            [ StoryPoints.view "An" <| getStoryPoints "Analytic" model
+            , StoryPoints.view "Dev" <| getStoryPoints "Development" model
+            , StoryPoints.view "Test" <| getStoryPoints "Testing" model
             ]
 
 cardStyle : String -> Attribute
