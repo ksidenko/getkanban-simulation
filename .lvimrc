@@ -8,6 +8,7 @@ set includeexpr=substitute(v:fname,'\\.','/','g')
 
 " Elm project runtime settings
 let g:elm_make_rootpath = '~/PhpstormProjects/getkanban-simulation/'
+let g:elm_make_filepath_prefix = "src/"
 
 " Project settings
 au BufRead,BufNewFile *.elm set sw=2 ts=2 expandtab
