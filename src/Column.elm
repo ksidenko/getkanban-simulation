@@ -3,9 +3,10 @@ module Column (Model, init, Action, update, view) where
 import Html exposing (..)
 import Html.Attributes exposing (style)
 import Html.Events exposing (onClick)
+import Dict exposing (Dict)
 
 import Card
-import Column.Header
+import Card.StoryPoints 
 
 -- MODEL
 
@@ -62,14 +63,10 @@ view : Signal.Address Action -> Model -> Html
 view address model =
   let
     width = (\hasDone -> if hasDone == False then 92 else 185) model.hasDone
-    --context =
-        --Column.Header.Context
-          --(Signal.forwardTo address (AddCard))
   in
   div [ columnStyle width ]
     [ headerView address model
-    --Column.Header.view context model
-    , columnView address model width
+    , columnView address width model
     ]
 
 headerView : Signal.Address Action -> Model -> Html
@@ -81,15 +78,40 @@ headerView address model =
     , div [] [ button [ onClick address AddCard ] [ text "Add Card" ] ]
     ]
 
-columnView : Signal.Address Action -> Model -> Int -> Html
-columnView address model widthCss =
-    if not model.hasDone then
-        div [] [ oneColumnView address model.cards 80]
+columnView : Signal.Address Action -> Int -> Model -> Html
+columnView address widthCss model =
+  let
+    f storyPointsTitle ( _, card ) =
+      Dict.get storyPointsTitle card.storyPoints
+        |> Maybe.withDefault (-1, -1)
+        |> Card.StoryPoints.isDone
+        |> not
+
+    (inProgressCards, doneCards) = List.partition ( f model.name ) model.cards
+    widthCssOffset = 15
+  in
+    if not model.hasDone then -- only one column
+      div [] [ subColumnView address model.cards widthCss ]
     else
-        div []
-            [ oneColumnView address model.cards 80
-            , oneColumnView address model.cards 80
-            ]
+      div []
+        [ subColumnView address inProgressCards (widthCss // 2 - widthCssOffset )
+        , subColumnView address doneCards (widthCss // 2 - widthCssOffset )
+        ]
+
+
+subColumnView : Signal.Address Action -> List (ID, Card.Model) -> Int -> Html
+subColumnView address cards widthCss =
+  div [ columnStyle (widthCss) ] [ div [] (List.map (cardView address) cards) ]
+
+
+cardView : Signal.Address Action -> (ID, Card.Model) -> Html
+cardView address (id, model) =
+  let context =
+    Card.Context
+        (Signal.forwardTo address (Modify id))
+  in
+    Card.view context model
+
 
 columnStyle : Int -> Attribute
 columnStyle cssColumnWidth =
@@ -100,17 +122,3 @@ columnStyle cssColumnWidth =
     , ("border", "1px solid green")
     , ("margin-right", "10px")
     ]
-
-oneColumnView : Signal.Address Action -> List (ID, Card.Model) -> Int -> Html
-oneColumnView address cards widthCss =
-  div [ columnStyle (widthCss) ]
-    [ div [] (List.map (cardView address) cards)
-    ]
-
-cardView : Signal.Address Action -> (ID, Card.Model) -> Html
-cardView address (id, model) =
-  let context =
-    Card.Context
-        (Signal.forwardTo address (Modify id))
-  in
-    Card.view context model
