@@ -81,13 +81,10 @@ headerView address model =
 columnView : Signal.Address Action -> Int -> Model -> Html
 columnView address widthCss model =
   let
-    f storyPointsTitle ( _, card ) =
-      Dict.get storyPointsTitle card.storyPoints
-        |> Maybe.withDefault (-1, -1)
-        |> Card.StoryPoints.isDone
-        |> not
+    f storyPointsTitle ( _, card ) = not <| Card.isDone storyPointsTitle card
 
     (inProgressCards, doneCards) = List.partition ( f model.name ) model.cards
+
     widthCssOffset = 15
   in
     if not model.hasDone then -- only one column
