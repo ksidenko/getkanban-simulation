@@ -81,19 +81,20 @@ headerView address model =
 columnView : Signal.Address Action -> Int -> Model -> Html
 columnView address widthCss model =
   let
-    f storyPointsTitle ( _, card ) = not <| Card.isDone storyPointsTitle card
-
-    (inProgressCards, doneCards) = List.partition ( f model.name ) model.cards
-
-    widthCssOffset = 15
+    columnList =
+      if not model.hasDone then -- only one column
+        [ subColumnView address model.cards widthCss ]
+      else
+        let
+          widthCssOffset = 15
+          f storyPointsTitle ( _, card ) = not <| Card.isDone storyPointsTitle card
+          (inProgressCards, doneCards) = List.partition ( f model.name ) model.cards
+        in
+          [ subColumnView address inProgressCards (widthCss // 2 - widthCssOffset )
+          , subColumnView address doneCards (widthCss // 2 - widthCssOffset )
+          ]
   in
-    if not model.hasDone then -- only one column
-      div [] [ subColumnView address model.cards widthCss ]
-    else
-      div []
-        [ subColumnView address inProgressCards (widthCss // 2 - widthCssOffset )
-        , subColumnView address doneCards (widthCss // 2 - widthCssOffset )
-        ]
+    div [] ( columnList )
 
 
 subColumnView : Signal.Address Action -> List (ID, Card.Model) -> Int -> Html
