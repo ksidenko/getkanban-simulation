@@ -7,16 +7,16 @@ import Dict exposing (Dict)
 
 import Card
 import Card.StoryPoints
+import Column.Header
+
 
 -- MODEL
 
 type alias Model =
     { cards: List ( ID, Card.Model )
     , nextID : ID
-    , name: String
-    , dicesCount: Int
-    , wipLimit: Int
     , hasDone: Bool
+    , header: Column.Header.Model
     }
 
 type alias ID = Int
@@ -27,10 +27,8 @@ init : String -> Int -> Int -> Bool -> Model
 init name dicesCount wipLimit hasDone =
     { cards = []
     , nextID = 0
-    , name = name
-    , dicesCount = dicesCount
-    , wipLimit = wipLimit
     , hasDone = hasDone
+    , header = Column.Header.init name wipLimit dicesCount
     }
 
 -- UPDATE
@@ -83,20 +81,13 @@ view : Context -> Model -> Html
 view context model =
   let
     width = (\hasDone -> if hasDone == False then 92 else 185) model.hasDone
+    contextHeader = Column.Header.Context
+        (Signal.forwardTo context.actions (always ( AddCard )))
   in
     div [ columnStyle width ]
-      [ headerView context model
+      [ Column.Header.view contextHeader model.header
       , columnView context width model
       ]
-
-headerView : Context -> Model -> Html
-headerView context model =
-  div []
-    [ div [] [ text ( model.name ++ " (" ++ toString(model.wipLimit) ++ ")") ]
-    , hr [] []
-    , div [] [ text ( "Dices: " ++ toString (model.dicesCount ) ) ]
-    , div [] [ button [ onClick context.actions AddCard ] [ text "Add Card" ] ]
-    ]
 
 columnView : Context -> Int -> Model -> Html
 columnView context widthCss model =
@@ -108,7 +99,7 @@ columnView context widthCss model =
         let
           widthCssOffset = 15
           f storyPointsTitle ( _, card ) = not <| Card.isDone storyPointsTitle card
-          (inProgressCards, doneCards) = List.partition ( f model.name ) model.cards
+          (inProgressCards, doneCards) = List.partition ( f model.header.name ) model.cards
         in
           [ subColumnView context inProgressCards (widthCss // 2 - widthCssOffset )
           , subColumnView context doneCards (widthCss // 2 - widthCssOffset )
