@@ -1,4 +1,4 @@
-module Column (Model, init, Action, update, view) where
+module Column (Model, init, update, view, Action, unsafeCard, Context ) where
 
 import Html exposing (..)
 import Html.Attributes exposing (style)
@@ -6,7 +6,7 @@ import Html.Events exposing (onClick)
 import Dict exposing (Dict)
 
 import Card
-import Card.StoryPoints 
+import Card.StoryPoints
 
 -- MODEL
 
@@ -20,6 +20,7 @@ type alias Model =
     }
 
 type alias ID = Int
+type alias CardID = Int
 
 
 init : String -> Int -> Int -> Bool -> Model
@@ -36,7 +37,8 @@ init name dicesCount wipLimit hasDone =
 
 type Action
     = AddCard
-    | Modify ID Card.Action
+    | DelCard ID
+    | EditCard ID Card.Action
 
 
 update : Action -> Model -> Model
@@ -48,7 +50,12 @@ update action model =
           nextID = model.nextID + 1
       }
 
-    Modify id cardAction ->
+    DelCard id ->
+      { model |
+          cards = List.filter (\(cardId, _) -> cardId /= id) model.cards
+      }
+
+    EditCard id cardAction ->
       let updateCard (cardID, cardModel) =
         if cardID == id then
             (cardID, Card.update cardAction cardModel)
@@ -57,58 +64,72 @@ update action model =
       in
         { model | cards = List.map updateCard model.cards }
 
+
+unsafeCard : Int -> List ( ID, Card.Model ) -> Card.Model
+unsafeCard cardId cards =
+  let card = List.filter (\(cardId', _) -> cardId' == cardId) cards |> List.head
+  in case card of
+       Just card -> snd card
+       Nothing -> Debug.crash ("No such card id: " ++ toString (cardId))
+
 -- VIEW
 
-view : Signal.Address Action -> Model -> Html
-view address model =
+type alias Context =
+    { actions : Signal.Address Action
+    , move: Signal.Address CardID
+    }
+
+view : Context -> Model -> Html
+view context model =
   let
     width = (\hasDone -> if hasDone == False then 92 else 185) model.hasDone
   in
-  div [ columnStyle width ]
-    [ headerView address model
-    , columnView address width model
-    ]
+    div [ columnStyle width ]
+      [ headerView context model
+      , columnView context width model
+      ]
 
-headerView : Signal.Address Action -> Model -> Html
-headerView address model =
+headerView : Context -> Model -> Html
+headerView context model =
   div []
     [ div [] [ text ( model.name ++ " (" ++ toString(model.wipLimit) ++ ")") ]
     , hr [] []
     , div [] [ text ( "Dices: " ++ toString (model.dicesCount ) ) ]
-    , div [] [ button [ onClick address AddCard ] [ text "Add Card" ] ]
+    , div [] [ button [ onClick context.actions AddCard ] [ text "Add Card" ] ]
     ]
 
-columnView : Signal.Address Action -> Int -> Model -> Html
-columnView address widthCss model =
+columnView : Context -> Int -> Model -> Html
+columnView context widthCss model =
   let
     columnList =
       if not model.hasDone then -- only one column
-        [ subColumnView address model.cards widthCss ]
+        [ subColumnView context model.cards widthCss ]
       else
         let
           widthCssOffset = 15
           f storyPointsTitle ( _, card ) = not <| Card.isDone storyPointsTitle card
           (inProgressCards, doneCards) = List.partition ( f model.name ) model.cards
         in
-          [ subColumnView address inProgressCards (widthCss // 2 - widthCssOffset )
-          , subColumnView address doneCards (widthCss // 2 - widthCssOffset )
+          [ subColumnView context inProgressCards (widthCss // 2 - widthCssOffset )
+          , subColumnView context doneCards (widthCss // 2 - widthCssOffset )
           ]
   in
     div [] ( columnList )
 
 
-subColumnView : Signal.Address Action -> List (ID, Card.Model) -> Int -> Html
-subColumnView address cards widthCss =
-  div [ columnStyle (widthCss) ] [ div [] (List.map (cardView address) cards) ]
+subColumnView : Context -> List (ID, Card.Model) -> Int -> Html
+subColumnView context cards widthCss =
+  div [ columnStyle (widthCss) ] [ div [] (List.map (cardView context) cards) ]
 
 
-cardView : Signal.Address Action -> (ID, Card.Model) -> Html
-cardView address (id, model) =
-  let context =
+cardView : Context -> (ID, Card.Model) -> Html
+cardView context (id, model) =
+  let context' =
     Card.Context
-        (Signal.forwardTo address (Modify id))
+        (Signal.forwardTo context.actions (always (AddCard)))
+        (Signal.forwardTo context.move (always ( id )))
   in
-    Card.view context model
+    Card.view context' model
 
 
 columnStyle : Int -> Attribute

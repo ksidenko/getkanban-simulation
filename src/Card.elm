@@ -19,14 +19,15 @@ init (anLimit, devLimit, testLimit) =
     { dicesCount = 0
     , storyPoints =
         Dict.fromList
-            [ ("Analytic", StoryPoints.init anLimit)
-            , ("Development", StoryPoints.init devLimit)
-            , ("Testing", StoryPoints.init testLimit)
-            ]
+          [ ("Analytic", StoryPoints.init anLimit)
+          , ("Development", StoryPoints.init devLimit)
+          , ("Testing", StoryPoints.init testLimit)
+          ]
     }
 
-getStoryPoints : String -> Model -> StoryPoints.Model
-getStoryPoints storyPointsTitle model =
+
+unsafeStoryPoint : String -> Model -> StoryPoints.Model
+unsafeStoryPoint storyPointsTitle model =
   let pointsForCheck = Dict.get storyPointsTitle model.storyPoints
   in
     case pointsForCheck of
@@ -36,7 +37,7 @@ getStoryPoints storyPointsTitle model =
 
 isDone : String -> Model -> Bool
 isDone storyPointsTitle model =
-  getStoryPoints storyPointsTitle model
+  unsafeStoryPoint storyPointsTitle model
     |> StoryPoints.isDone
 
 
@@ -44,6 +45,7 @@ isDone storyPointsTitle model =
 
 type Action
     = ToggleSelectCard
+    | MoveRight
 
 update : Action -> Model -> Model
 update action model =
@@ -51,22 +53,29 @@ update action model =
     ToggleSelectCard ->
       { model | dicesCount = if model.dicesCount == 1 then 0 else 1 }
 
+    MoveRight ->
+      model
+
 -- VIEW
 
 type alias Context =
     { actions : Signal.Address Action
+    , move : Signal.Address ()
     }
 
 view : Context -> Model -> Html
 view context model =
-    let 
+    let
       bgColor = if model.dicesCount > 0 then "green" else "white"
     in
+    div [] [
         span [ cardStyle bgColor, onClick context.actions ToggleSelectCard ]
-            [ StoryPoints.view "An" <| getStoryPoints "Analytic" model
-            , StoryPoints.view "Dev" <| getStoryPoints "Development" model
-            , StoryPoints.view "Test" <| getStoryPoints "Testing" model
+            [ StoryPoints.view "An" <| unsafeStoryPoint "Analytic" model
+            , StoryPoints.view "Dev" <| unsafeStoryPoint "Development" model
+            , StoryPoints.view "Test" <| unsafeStoryPoint "Testing" model
             ]
+            , div [] [ button [ onClick context.move () ] [ text "->" ]]
+          ]
 
 cardStyle : String -> Attribute
 cardStyle bgColor =
