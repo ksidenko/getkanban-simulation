@@ -61,6 +61,7 @@ update action model =
 type alias Context =
     { actions : Signal.Address Action
     , move : Signal.Address ()
+    , del : Signal.Address ()
     }
 
 view : Context -> Model -> Html
@@ -74,7 +75,9 @@ view context model =
             , StoryPoints.view "Dev" <| unsafeStoryPoint "Development" model
             , StoryPoints.view "Test" <| unsafeStoryPoint "Testing" model
             ]
-            , div [] [ button [ onClick context.move () ] [ text "->" ]]
+            , div [] [ button [ onClick context.move () ] [ text "-> " ]
+                     , button [ onClick context.del () ] [ text "x" ]
+                     ]
           ]
 
 cardStyle : String -> Attribute

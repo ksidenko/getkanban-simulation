@@ -127,7 +127,8 @@ cardView context (id, model) =
   let context' =
     Card.Context
         (Signal.forwardTo context.actions (EditCard id))
-        (Signal.forwardTo context.move (always ( id )))
+        (Signal.forwardTo context.actions (always (DelCard id)))
+        (Signal.forwardTo context.move (always (id)))
   in
     Card.view context' model
 
