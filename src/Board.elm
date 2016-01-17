@@ -9,23 +9,26 @@ import Column exposing (Model, init, update, view, Action, unsafeCard, Context)
 -- MODEL
 
 type alias Model =
-    { columns : Array ( Column.Model )
+    { columns : List ( ID, Column.Model )
+    , nextID : ID
     }
 
 
 init : Int -> Int -> Int -> Int -> Int -> Model
 init s a d t dd =
-    { columns = Array.fromList
-        ([ Column.init "Selected" 2 a False
-        , Column.init "Analytic" 3 a True
-        , Column.init "Development" 2 d True
-        , Column.init "Testing" 2 t False
-        , Column.init "Deploy" 100 dd False
-        ])
+    { columns =
+      [ ( 0, Column.init "Selected" 2 a False )
+      , ( 1, Column.init "Analytic" 3 a True )
+      , ( 2, Column.init "Development" 2 d True )
+      , ( 3, Column.init "Testing" 2 t False )
+      , ( 4, Column.init "Deploy" 100 dd False )
+      ]
+    , nextID = 5
     }
 
 -- UPDATE
 
+type alias ID = Int
 type alias ColumnID = Int
 type alias CardID = Int
 
@@ -40,52 +43,53 @@ update action model =
 
     ModifyColumn id act ->
       let
-        column = unsafeColumn id model.columns
-        column' = Column.update act column
+        updateColumn (columnId, columnModel) =
+          if columnId == id then
+            (columnId, Column.update act columnModel)
+          else
+            (columnId, columnModel)
       in
-        { model | columns = set id column' model.columns }
-
+        { model | columns = List.map updateColumn model.columns }
 
     MoveCardToNextColumn columnId cardId ->
-      let
-        column = unsafeColumn columnId model.columns
-        card = Column.unsafeCard cardId column.cards
-        columnNextId = columnId + 1
-
-        -- delete card from column
-        column' = { column | cards = List.filter (\(cardId', _) -> cardId' /= cardId) column.cards }
-        columns' = set columnId column' model.columns
-
-        -- move card to next column, if it is exist
-        f columns' columnNextId =
-          let columnNext_ = get columnNextId model.columns
-          in case columnNext_ of
-            Just columnNext ->
+      let columnCheck = List.filter ( \(columnId', _) -> columnId' == columnId ) model.columns |> List.head
+      in case columnCheck of
+        Just ( _, column ) ->
+          let card = List.filter (\(cardId', _) -> cardId' == cardId) ( column.cards ) |> List.head
+          in case card of
+            Just ( _, card ) ->
               let
-                columnNext' = { columnNext |
-                  cards = ( columnNext.nextID, card )::columnNext.cards,
-                  nextID = columnNext.nextID + 1
-                }
+                -- delete card from column
+                column' = { column | cards = List.filter (\(cardId', _) -> cardId' /= cardId) column.cards }
+
+                updateColumn (id_, column) = if id_ == columnId then (id_, column') else (id_, column)
+                model' = { model | columns = List.map updateColumn model.columns }
+
+
+                -- move card to next column, if it is exist
+                columnNextId = columnId + 1
+                model'' =
+                  if List.length model.columns /= columnNextId then
+                    let columnCheck = List.filter ( \(columnId', _) -> columnId' == columnNextId ) model.columns |> List.head
+                    in case columnCheck of
+                      Just ( _, columnNext ) ->
+                        let
+                          columnNext' = { columnNext |
+                            cards = ( columnNext.nextID, card )::columnNext.cards,
+                            nextID = columnNext.nextID + 1
+                          }
+
+                          updateColumn (id_, column) = if id_ == columnNextId then (id_, columnNext') else (id_, column)
+                          model'' = { model' | columns = List.map updateColumn model'.columns }
+                        in
+                          model''
+                      Nothing -> model' -- no next column (impossible case ;-)
+                  else
+                    model'
               in
-                set columnNextId columnNext' columns'
-
-            Nothing ->
-              columns'
-
-        --columnNext' = Column.update AddCard columnNext
-        --column' = Column.update DelCard column
-      in
-        { model | columns = f columns' columnNextId}
-
-
-unsafeColumn : Int -> Array ( Column.Model ) -> Column.Model
-unsafeColumn columnId columns =
-  let
-    column = get columnId columns
-  in
-    case column of
-      Just column' -> column'
-      Nothing -> Debug.crash ("no such column index: " ++ toString(id))
+                model''
+            Nothing -> model -- no such card in column
+        Nothing -> model -- no such column
 
 
 -- VIEW
@@ -101,5 +105,5 @@ view address model =
       in
         Column.view ( context ) column
   in
-    div [] ( List.map f ( Array.toIndexedList model.columns ) )
+    div [] ( List.map f model.columns )
 
