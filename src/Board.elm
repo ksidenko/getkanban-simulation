@@ -1,73 +1,62 @@
 module Board where
 
+import Array exposing (..)
 import Html exposing (..)
-import Html.Attributes exposing (style)
-import Html.Events exposing (onClick)
+import Html.Attributes exposing (..)
+import Html.Events exposing (..)
 import Column exposing (Model, init, update, view)
 
 -- MODEL
 
 type alias Model =
-    { selected : Column.Model
-    , analytic: Column.Model
-    , development: Column.Model
-    , testing: Column.Model
-    , deploy: Column.Model
+    { columns : Array ( Column.Model )
     }
 
 
 init : Int -> Int -> Int -> Int -> Int -> Model
 init s a d t dd =
-    { selected = Column.init "Selected" 2 a False
-    , analytic = Column.init "Analytic" 3 a True
-    , development = Column.init "Development" 2 d True
-    , testing = Column.init "Testing" 2 t False
-    , deploy = Column.init "Deploy" 100 dd False
+    { columns = Array.fromList
+        ([ Column.init "Selected" 2 a False
+        , Column.init "Analytic" 3 a True
+        , Column.init "Development" 2 d True
+        , Column.init "Testing" 2 t False
+        , Column.init "Deploy" 100 dd False
+        ])
     }
 
 -- UPDATE
 
-type Action
-    = SelectedAddCard Column.Action
-    | AnalyticAddCard Column.Action
-    | DevelopmentAddCard Column.Action
-    | TestingAddCard Column.Action
-    | DeployAddCard Column.Action
+type alias ColumnID = Int
 
+type Action
+    = ModifyColumn ColumnID Column.Action
 
 
 update : Action -> Model -> Model
 update action model =
   case action of
-    SelectedAddCard act ->
-      { model | selected = Column.update act model.selected
-      }
 
-    AnalyticAddCard act ->
-      { model | analytic = Column.update act model.analytic
-      }
+    ModifyColumn id act ->
+      let
+        column =
+          let
+            columnForCheck = get id model.columns
+          in
+            case columnForCheck of
+              Just column -> column
+              Nothing -> Debug.crash ("no such column index: " ++ toString(id))
 
-    DevelopmentAddCard act ->
-      { model | development = Column.update act model.development
-      }
-
-    TestingAddCard act ->
-      { model | testing = Column.update act model.testing
-      }
-
-    DeployAddCard act ->
-      { model | deploy = Column.update act model.deploy
-      }
+        column' = Column.update act column
+      in
+        { model | columns = set id column' model.columns }
 
 -- VIEW
 
 view : Signal.Address Action -> Model -> Html
 view address model =
-  div []
-    [ div [] [ text "" ]
-    , Column.view (Signal.forwardTo address SelectedAddCard) model.selected
-    , Column.view (Signal.forwardTo address AnalyticAddCard) model.analytic
-    , Column.view (Signal.forwardTo address DevelopmentAddCard) model.development
-    , Column.view (Signal.forwardTo address TestingAddCard) model.testing
-    , Column.view (Signal.forwardTo address DeployAddCard) model.deploy
-    ]
+  let
+    f ( id, column ) =
+      Column.view ( Signal.forwardTo address ( ModifyColumn id ) ) column
+  in
+    div [] ( List.map f ( Array.toIndexedList model.columns ) )
+
