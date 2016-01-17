@@ -60,8 +60,8 @@ update action model =
 
 type alias Context =
     { actions : Signal.Address Action
-    , move : Signal.Address ()
     , del : Signal.Address ()
+    , move : Signal.Address ()
     }
 
 view : Context -> Model -> Html
