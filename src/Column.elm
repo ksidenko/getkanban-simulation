@@ -126,7 +126,7 @@ cardView : Context -> (ID, Card.Model) -> Html
 cardView context (id, model) =
   let context' =
     Card.Context
-        (Signal.forwardTo context.actions (always (AddCard)))
+        (Signal.forwardTo context.actions (EditCard id))
         (Signal.forwardTo context.move (always ( id )))
   in
     Card.view context' model
