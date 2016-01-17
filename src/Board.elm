@@ -43,11 +43,7 @@ update action model =
 
     ModifyColumn id act ->
       let
-        updateColumn (columnId, columnModel) =
-          if columnId == id then
-            (columnId, Column.update act columnModel)
-          else
-            (columnId, columnModel)
+        updateColumn (id_, column) = if id_ == id then (id_, Column.update act column) else (id_, column)
       in
         { model | columns = List.map updateColumn model.columns }
 
@@ -103,7 +99,7 @@ view address model =
             ( Signal.forwardTo address ( ModifyColumn columnId ) )
             ( Signal.forwardTo address ( MoveCardToNextColumn columnId ))
       in
-        Column.view ( context ) column
+        Column.view context column
   in
     div [] ( List.map f model.columns )
 
