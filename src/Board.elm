@@ -56,11 +56,10 @@ update action model =
             Just ( _, card ) ->
               let
                 -- delete card from column
-                column' = { column | cards = List.filter (\(cardId', _) -> cardId' /= cardId) column.cards }
+                column' = Column.update ( Column.DelCard cardId ) column
 
                 updateColumn (id_, column) = if id_ == columnId then (id_, column') else (id_, column)
                 model' = { model | columns = List.map updateColumn model.columns }
-
 
                 -- move card to next column, if it is exist
                 columnNextId = columnId + 1
@@ -70,10 +69,7 @@ update action model =
                     in case columnCheck of
                       Just ( _, columnNext ) ->
                         let
-                          columnNext' = { columnNext |
-                            cards = ( columnNext.nextID, card )::columnNext.cards,
-                            nextID = columnNext.nextID + 1
-                          }
+                          columnNext' = Column.update (Column.AddCard card ) columnNext
 
                           updateColumn (id_, column) = if id_ == columnNextId then (id_, columnNext') else (id_, column)
                           model'' = { model' | columns = List.map updateColumn model'.columns }

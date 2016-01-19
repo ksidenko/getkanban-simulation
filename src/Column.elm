@@ -1,4 +1,4 @@
-module Column (Model, init, update, view, Action, unsafeCard, Context ) where
+module Column (Model, init, update, view, Action(AddCard, DelCard), unsafeCard, Context ) where
 
 import Html exposing (..)
 import Html.Attributes exposing (style)
@@ -34,7 +34,7 @@ init name dicesCount wipLimit hasDone =
 -- UPDATE
 
 type Action
-    = AddCard
+    = AddCard Card.Model
     | DelCard ID
     | EditCard ID Card.Action
 
@@ -42,9 +42,9 @@ type Action
 update : Action -> Model -> Model
 update action model =
   case action of
-    AddCard ->
+    AddCard card ->
       { model |
-          cards = ( model.nextID, Card.init (2, 3, 2) ) :: model.cards,
+          cards = ( model.nextID, card ) :: model.cards,
           nextID = model.nextID + 1
       }
 
@@ -82,7 +82,7 @@ view context model =
   let
     width = (\hasDone -> if hasDone == False then 92 else 185) model.hasDone
     contextHeader = Column.Header.Context
-        (Signal.forwardTo context.actions (always ( AddCard )))
+        (Signal.forwardTo context.actions (always ( AddCard ( Card.init (2,3,2) ))))
   in
     div [ columnStyle width ]
       [ Column.Header.view contextHeader model.header
