@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 module Column (Model, init, update, view, Action(AddCard, DelCard), unsafeCard, Context ) where
+=======
+module Column (Model, init, update, view, Action, Context ) where
+>>>>>>> b969fdbb2fa8c7da4142f5d8d910beffabeb232f
 
 import Html exposing (..)
 import Html.Attributes exposing (style)
@@ -42,33 +46,31 @@ type Action
 update : Action -> Model -> Model
 update action model =
   case action of
+<<<<<<< HEAD
     AddCard card ->
       { model |
           cards = ( model.nextID, card ) :: model.cards,
           nextID = model.nextID + 1
+=======
+    AddCard ->
+      { model
+        | cards = ( model.nextID, Card.init (2, 3, 2) ) :: model.cards
+        , nextID = model.nextID + 1
+>>>>>>> b969fdbb2fa8c7da4142f5d8d910beffabeb232f
       }
 
     DelCard id ->
-      { model |
-          cards = List.filter (\(cardId, _) -> cardId /= id) model.cards
+      { model
+        | cards = List.filter (\(cardId, _) -> cardId /= id) model.cards
       }
 
     EditCard id cardAction ->
       let updateCard (cardID, cardModel) =
-        if cardID == id then
-            (cardID, Card.update cardAction cardModel)
-        else
-          (cardID, cardModel)
+        if cardID == id
+            then (cardID, Card.update cardAction cardModel)
+            else (cardID, cardModel)
       in
         { model | cards = List.map updateCard model.cards }
-
-
-unsafeCard : Int -> List ( ID, Card.Model ) -> Card.Model
-unsafeCard cardId cards =
-  let card = List.filter (\(cardId', _) -> cardId' == cardId) cards |> List.head
-  in case card of
-       Just card -> snd card
-       Nothing -> Debug.crash ("No such card id: " ++ toString (cardId))
 
 -- VIEW
 

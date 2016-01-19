@@ -4,7 +4,7 @@ import Array exposing (..)
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
-import Column exposing (Model, init, update, view, Action, unsafeCard, Context)
+import Column exposing (Model, init, update, view, Action, Context)
 
 -- MODEL
 
@@ -90,7 +90,7 @@ view : Signal.Address Action -> Model -> Html
 view address model =
   let
     f ( columnId, column ) =
-      let 
+      let
         context = Column.Context
             ( Signal.forwardTo address ( ModifyColumn columnId ) )
             ( Signal.forwardTo address ( MoveCardToNextColumn columnId ))
@@ -98,4 +98,3 @@ view address model =
         Column.view context column
   in
     div [] ( List.map f model.columns )
-
