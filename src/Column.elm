@@ -1,8 +1,4 @@
-<<<<<<< HEAD
-module Column (Model, init, update, view, Action(AddCard, DelCard), unsafeCard, Context ) where
-=======
-module Column (Model, init, update, view, Action, Context ) where
->>>>>>> b969fdbb2fa8c7da4142f5d8d910beffabeb232f
+module Column (Model, init, update, view, Action(AddCard, DelCard), Context ) where
 
 import Html exposing (..)
 import Html.Attributes exposing (style)
@@ -46,17 +42,10 @@ type Action
 update : Action -> Model -> Model
 update action model =
   case action of
-<<<<<<< HEAD
     AddCard card ->
-      { model |
-          cards = ( model.nextID, card ) :: model.cards,
-          nextID = model.nextID + 1
-=======
-    AddCard ->
       { model
-        | cards = ( model.nextID, Card.init (2, 3, 2) ) :: model.cards
+        | cards = ( model.nextID, card ) :: model.cards
         , nextID = model.nextID + 1
->>>>>>> b969fdbb2fa8c7da4142f5d8d910beffabeb232f
       }
 
     DelCard id ->
