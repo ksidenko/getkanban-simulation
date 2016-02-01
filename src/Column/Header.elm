@@ -29,13 +29,13 @@ type alias Context =
     { actions : Signal.Address ()
     }
 
-view : Context -> Model -> Html
-view context model =
+view : Model -> Html
+view model =
   div []
     [ div [] [ text ( model.name ++ " (" ++ toString(model.wipLimit) ++ ")") ]
     , hr [] []
     , div [] [ text ( "Dices: " ++ toString (model.dicesCount ) ) ]
-    , div [] [ button [ onClick context.actions () ] [ text "Add Card" ] ]
+    --, div [] [ button [ onClick context.actions () ] [ text "Add Card" ] ]
     ]
 
 

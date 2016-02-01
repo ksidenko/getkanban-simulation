@@ -1,67 +1,82 @@
-module Card where
+module Card (update, view, Model, Context, Status(..), isDone, init, Action(..)) where
 
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
-import Dict exposing (Dict)
 
 import Card.StoryPoints as StoryPoints
 
 -- MODEL
 
 type alias Model =
-    { dicesCount : Int
-    , storyPoints : Dict String StoryPoints.Model
+    { status : Status
+    , dicesCount : Int
+    , analyticStoryPoints : StoryPoints.Model
+    , developmentStoryPoints : StoryPoints.Model
+    , testingStoryPoints : StoryPoints.Model
     }
 
 init : (Int, Int, Int) -> Model
 init (anLimit, devLimit, testLimit) =
-    { dicesCount = 0
-    , storyPoints =
-        Dict.fromList
-          [ ("Analytic", StoryPoints.init anLimit)
-          , ("Development", StoryPoints.init devLimit)
-          , ("Testing", StoryPoints.init testLimit)
-          ]
+    { status = Selected
+    , dicesCount = 0
+    , analyticStoryPoints = StoryPoints.init anLimit
+    , developmentStoryPoints = StoryPoints.init devLimit
+    , testingStoryPoints = StoryPoints.init testLimit
     }
-
-
-unsafeStoryPoint : String -> Model -> StoryPoints.Model
-unsafeStoryPoint storyPointsTitle model =
-  let pointsForCheck = Dict.get storyPointsTitle model.storyPoints
-  in
-    case pointsForCheck of
-      Just points -> points
-      Nothing -> Debug.crash ("Debug.crash info message: no such Story Point title " ++ storyPointsTitle )
-
 
 isDone : String -> Model -> Bool
 isDone storyPointsTitle model =
-  unsafeStoryPoint storyPointsTitle model
-    |> StoryPoints.isDone
+  let storyPoints = case storyPointsTitle of
+    "Analytic" -> model.analyticStoryPoints
+    "Development" -> model.developmentStoryPoints
+    "Testing" -> model.testingStoryPoints
+    _ -> model.analyticStoryPoints
+  in
+     StoryPoints.isDone storyPoints
 
 
 -- UPDATE
 
 type Action
     = ToggleSelectCard
-    | MoveRight
+    | NextStatus
+
+type Status
+    = Backlog
+    | Selected
+    | Analytic
+    | Development
+    | Testing
+    | ReadyForDeploy
+    | Deploy
 
 update : Action -> Model -> Model
 update action model =
   case action of
     ToggleSelectCard ->
-      { model | dicesCount = if model.dicesCount == 1 then 0 else 1 }
+      { model |
+          dicesCount = if model.dicesCount == 1 then 0 else 1
+      }
 
-    MoveRight ->
-      model
+    NextStatus ->
+      { model |
+          status = case model.status of
+                          Backlog -> Selected
+                          Selected -> Analytic
+                          Analytic -> Development
+                          Development -> Testing
+                          Testing -> ReadyForDeploy
+                          ReadyForDeploy -> Deploy
+                          Deploy -> Deploy
+      }
 
 -- VIEW
 
 type alias Context =
-    { actions : Signal.Address Action
+    --{ actions : Signal.Address Action
+    { move : Signal.Address ()
     , del : Signal.Address ()
-    , move : Signal.Address ()
     }
 
 view : Context -> Model -> Html
@@ -70,10 +85,12 @@ view context model =
       bgColor = if model.dicesCount > 0 then "green" else "white"
     in
     div [] [
-        span [ cardStyle bgColor, onClick context.actions ToggleSelectCard ]
-            [ StoryPoints.view "An" <| unsafeStoryPoint "Analytic" model
-            , StoryPoints.view "Dev" <| unsafeStoryPoint "Development" model
-            , StoryPoints.view "Test" <| unsafeStoryPoint "Testing" model
+        span [ cardStyle bgColor
+             --, onClick context.actions ToggleSelectCard
+             ]
+            [ StoryPoints.view "An" model.analyticStoryPoints
+            , StoryPoints.view "Dev" model.developmentStoryPoints
+            , StoryPoints.view "Test" model.testingStoryPoints
             ]
             , div [] [ button [ onClick context.move () ] [ text "-> " ]
                      , button [ onClick context.del () ] [ text "x" ]
