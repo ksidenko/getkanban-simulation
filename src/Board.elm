@@ -12,12 +12,6 @@ import Card exposing (Model, init, update, view, Action(..), Status(..))
 type alias Model =
     { cards : List ( ID, Card.Model )
     , nextID : ID
-    , selectedColumn : Column.Model
-    , analyticColumn : Column.Model
-    , developmentColumn : Column.Model
-    , testingColumn : Column.Model
-    , readyForDeployColumn : Column.Model
-    , deployColumn : Column.Model
     }
 
 
@@ -29,12 +23,6 @@ init s a d t dd =
             , (3, Card.init ( 1, 1, 5 ))
             ]
     , nextID = 0
-    , selectedColumn = Column.init "Selected" 2 a False
-    , analyticColumn = Column.init "Analytic" 3 a True
-    , developmentColumn = Column.init "Development" 2 d True
-    , testingColumn = Column.init "Testing" 2 t False
-    , readyForDeployColumn = Column.init "Ready For Deploy" 10 dd False
-    , deployColumn = Column.init "Deploy" 10 dd False
     }
 
 -- UPDATE
@@ -99,10 +87,10 @@ view address model =
       ( Signal.forwardTo address ( DelCard ))
   in
       div []
-        [ Column.view context cardsSelected model.selectedColumn
-        , Column.view context cardsAnalytic model.analyticColumn
-        , Column.view context cardsDevelopment model.developmentColumn
-        , Column.view context cardsTesting  model.testingColumn
-        , Column.view context cardsReadyForDeploy model.readyForDeployColumn
-        , Column.view context cardsDeploy model.deployColumn
+        [ Column.view context cardsSelected (Column.init "Selected" 2 2 False)
+        , Column.view context cardsAnalytic (Column.init "Analytic" 2 3 True)
+        , Column.view context cardsDevelopment (Column.init "Development" 3 3 True)
+        , Column.view context cardsTesting (Column.init "Testing" 2 2 False)
+        , Column.view context cardsReadyForDeploy (Column.init "ReadyForDeploy" 2 9 False)
+        , Column.view context cardsDeploy (Column.init "Deploy" 2 9 False)
         ]

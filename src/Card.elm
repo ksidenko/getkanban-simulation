@@ -55,20 +55,21 @@ update : Action -> Model -> Model
 update action model =
   case action of
     ToggleSelectCard ->
-      { model |
-          dicesCount = if model.dicesCount == 1 then 0 else 1
+      { model
+        | dicesCount = if model.dicesCount == 1 then 0 else 1
       }
 
     NextStatus ->
-      { model |
-          status = case model.status of
-                          Backlog -> Selected
-                          Selected -> Analytic
-                          Analytic -> Development
-                          Development -> Testing
-                          Testing -> ReadyForDeploy
-                          ReadyForDeploy -> Deploy
-                          Deploy -> Deploy
+      { model
+        | status =
+            case model.status of
+              Backlog -> Selected
+              Selected -> Analytic
+              Analytic -> Development
+              Development -> Testing
+              Testing -> ReadyForDeploy
+              ReadyForDeploy -> Deploy
+              Deploy -> Deploy
       }
 
 -- VIEW

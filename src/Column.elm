@@ -39,7 +39,7 @@ type alias Context =
 view : Context -> List ( ID, Card.Model ) -> Model -> Html
 view context cards model =
   let
-    width = (\hasDone -> if hasDone == False then 92 else 185) model.hasDone
+    width = if model.hasDone == False then 92 else 185
     --contextHeader = Column.Header.Context
         --(Signal.forwardTo context.actions (always ( AddCard ( Card.init (2,3,2) ))))
   in
